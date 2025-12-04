@@ -1,18 +1,22 @@
-## Usage
-
-Use the gpenv_311.yml file to create a conda environment. You must also install the old version of GoodVibes
+## GetProperties
+This repository contains an updated version of the Sigman group's "Get_Properties" script with enhanced
+features such as parallelization and automated conversion of Gaussian 16 logfiles.
 
 ## Installation
-
 1.  Create a conda environment using the  gpenv_311.yml file. <br>
     `conda env create -f gpenv_311.yml`
+
 2.  Activate the environment. <br>
     `conda activate gp_env`
+
 3.  Install Goodvibes (Jupyter Notebook branch) <br>
     `git clone https://github.com/patonlab/goodvibes` <br>
     `cd goodvibes` <br>
     `git checkout GV2021` <br>
     `python setup.py install` <br>
+
+## Usage
+Use the gpenv_311.yml file to create a conda environment. You must also install the old version of GoodVibes
 
 ## Parallelized Functions
 1.  get_goodvibes_e
@@ -41,6 +45,8 @@ Use the gpenv_311.yml file to create a conda environment. You must also install 
 
 # To-do
 1. Implement get_IR function
+2. Include static copy of old version of GoodVibes (or just update it)
+3. Rename get_nmr function
 
 ## Major changes
 - `get_buried_sterimol` has been combined into `get_sterimol_morfeus`. Specifying a radius will automatically bury the molecule while regular sterimol is calculated if `radius` is `None`
