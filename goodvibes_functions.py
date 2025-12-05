@@ -17,7 +17,7 @@ print(gv.GVOptions())
 import goodvibes.thermo as thermo
 import goodvibes.io as io
 
-print(gv.GVOptions())
+from utils import FILE_COLUMN_NAME
 
 def _run_goodvibes(file: Path, options) -> pd.DataFrame:
     '''
@@ -43,7 +43,7 @@ def _run_goodvibes(file: Path, options) -> pd.DataFrame:
         vals = [getattr(bbe_val, k) for k in properties]
 
         row_i = pd.Series({
-                'log_name': file.name,
+                FILE_COLUMN_NAME: file.name,
                 'E_spc (Hartree)': vals[0],
                 'ZPE(Hartree)': vals[1],
                 'H_spc(Hartree)': vals[2],
@@ -57,7 +57,7 @@ def _run_goodvibes(file: Path, options) -> pd.DataFrame:
         print(f'An exception has occurred: {e}')
         print(f'[ERROR] Unable to acquire GoodVibes energies for {file.name}')
         row_i = pd.Series({
-                            'log_name': file.name,
+                            FILE_COLUMN_NAME: file.name,
                             'E_spc (Hartree)': "no data",
                             'ZPE(Hartree)': "no data",
                             'H_spc(Hartree)': "no data",
@@ -78,14 +78,14 @@ def get_goodvibes_e(dataframe: pd.DataFrame,
     files should be found in the data_dir.
     '''
     # Make a results dataframe
-    e_dataframe = pd.DataFrame(columns=['log_name', 'E_spc (Hartree)', 'ZPE(Hartree)', 'H_spc(Hartree)', 'T*S', 'T*qh_S', 'G(T)_spc(Hartree)', 'qh_G(T)_spc(Hartree)', 'T'])
+    e_dataframe = pd.DataFrame(columns=[FILE_COLUMN_NAME, 'E_spc (Hartree)', 'ZPE(Hartree)', 'H_spc(Hartree)', 'T*S', 'T*qh_S', 'G(T)_spc(Hartree)', 'qh_G(T)_spc(Hartree)', 'T'])
 
     # Set goodvibes options
     options = gv.GVOptions()
     options.spc = 'link'
     options.temperature = temp
 
-    files = [Path(data_dir / x) for x in dataframe['log_name'].to_list()]
+    files = [Path(data_dir / x) for x in dataframe[FILE_COLUMN_NAME].to_list()]
 
     # Multiprocessing goodvibes is difficult because it will pickle some
     # strange objects and try to import everything a million times.
@@ -101,8 +101,8 @@ def get_goodvibes_e(dataframe: pd.DataFrame,
     print('[INFO] Goodvibes has completed.')
 
     # Merge the old and new dataframes based on the log name
-    e_dataframe.set_index('log_name', inplace=True, drop=True)
-    dataframe.set_index('log_name', inplace=True, drop=True)
+    e_dataframe.set_index(FILE_COLUMN_NAME, inplace=True, drop=True)
+    dataframe.set_index(FILE_COLUMN_NAME, inplace=True, drop=True)
 
     dataframe = pd.concat([dataframe, e_dataframe], axis=1)
     dataframe.reset_index(inplace=True)

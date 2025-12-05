@@ -25,7 +25,7 @@ from morfeus import SASA
 from utils import get_filecont, get_outstreams, get_geom
 from utils import get_specdata
 
-FILE_COLUMN_NAME = 'file'
+from utils import FILE_COLUMN_NAME
 
 # Misc
 homo_pattern = re.compile(r"Alpha  occ. eigenvalues", re.DOTALL)
@@ -1109,8 +1109,6 @@ def _get_vbur(row: pd.Series,
     # Get a results dictionary that contains all the keys of the atoms we're looking at
     atom_number_name_dict = {int(number): label for label, number in row.items() if label != FILE_COLUMN_NAME}
 
-    print(a_list)
-
     # Make a results dictionary
     results = {}
     for atom in a_list:
@@ -1154,7 +1152,7 @@ def get_vbur_scan(dataframe: pd.DataFrame,
                   start_r: float,
                   end_r: float,
                   step_size: float,
-                  procs: int = 1):
+                  procs: int = 1) -> pd.DataFrame:
     '''
     Uses MORFEUS to scan vbur across a series of radii
 
@@ -1163,15 +1161,26 @@ def get_vbur_scan(dataframe: pd.DataFrame,
     dataframe: pd.DataFrame
         DataFrame containing <FILE_COLUMN_NAME> column
 
+    data_dir: Path
+        Directory where the files are located
+
     alist: list[str]
         List of strings where the strings are the atom labels
-        that make up the angle of interest.
+
+    start_r: float
+        Initial radius of the scan for computing Vbur
+
+    end_r: float
+        End radius of the scan for computing Vbur
+
+    step_size: float
+        Step size for the scan
 
     data_dir: Path
         Directory where the files are located
 
     procs: int
-        Number of processors
+        Number of processors to use
 
     Returns
     ----------

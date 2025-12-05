@@ -14,6 +14,8 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, rdDetermineBonds
 from rdkit.Chem.Draw import rdMolDraw2D
 
+FILE_COLUMN_NAME = 'file'
+
 def log_to_sdf(log: Path):
     subprocess.run(args=['obabel', '-ilog', f'{log.absolute()}', '-osdf', '-m'], cwd=log.parent, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -30,8 +32,8 @@ def _get_atom_map(file: Path,
     Parameters
     ----------
     file: Path
-        An SDF file that has a corresponding Gaussian16
-        logifile in the same directory
+        An .mol or .sdf file that has a corresponding
+        Gaussian16 logfile in the same directory
 
     substructure: Chem.Mol
         Mol object that represents the substructure to be
@@ -53,7 +55,7 @@ def _get_atom_map(file: Path,
     logfile = file.with_suffix('.log')
 
     if not logfile.exists():
-        print(f'[WARNING] Expected {logfile} to exist from {file.name}')
+        print(f'[WARNING] Can not locate {logfile.absolute()}')
 
     mapping.append(logfile.name)
 
@@ -204,6 +206,23 @@ if __name__ == "__main__":
     mol = Chem.MolFromMolFile(str(file.absolute()))
 
 def _read_in_mol_sdf_with_xyz_correction(file: Path) -> tuple[Path | None]:
+    '''
+    Reads an RDKit Mol object from an .sdf or .mol file, falling back to an .xyz
+    conversion with OpenBabel and reconstructing connectivity and bond orders
+    when the initial read fails.
+
+    Parameters
+    ----------
+    file: Path
+        Path to the input structure file. Supported extensions are .sdf and .mol.
+
+    Returns
+    -------
+    file_and_mol: tuple
+        Tuple of (file, mol), where file is the original Path and mol is the
+        RDKit Mol object if successfully read, or None if reading and correction
+        both fail.
+    '''
     if file.suffix == '.sdf':
         mol = next(Chem.SDMolSupplier(str(file.absolute()), removeHs=False))
     elif file.suffix == '.mol':
