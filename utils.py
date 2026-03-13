@@ -50,6 +50,7 @@ def _get_atom_map(file: Path,
         List containing the name of the logfile and the
         atom numbers (1-indexed) of the mapped structure.
     '''
+    configure_logger(debug=True)
     if file.suffix not in ['.sdf', '.mol']:
         raise ValueError(f'Atom maps can only be extracted from .sdf files not {file.name}')
 
@@ -268,8 +269,7 @@ def _read_in_mol_sdf_with_xyz_correction(file: Path) -> tuple[Path | None]:
     return file, mol
 
 
-def convert_files_in_directory(directory: Path,
-                               failed_directory: Path) -> list[Path]:
+def convert_files_in_directory(directory: Path) -> list[Path]:
     '''
     Convert `.log` files in a directory to `.mol` files and identify failures.
 
@@ -277,9 +277,6 @@ def convert_files_in_directory(directory: Path,
     ----------
     directory: Path
         Directory containing `.log` files to convert.
-
-    failed_directory: Path
-        Directory intended for storing files that fail conversion.
 
     Returns
     -------
