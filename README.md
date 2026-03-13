@@ -8,11 +8,9 @@ This repository contains an updated version of the Sigman group's "Get_Propertie
 
     `conda env create -f gpenv_311.yml`
 
-2. Activate the environment. <br>
+2. Activate the environment and use the notebook. <br>
 
-'''
-conda activate gp_env
-'''
+    `conda activate gp_env`
 
 ## Usage
 
@@ -20,7 +18,7 @@ Work in progress.
 
 ## Parallelized Functions
 
-1. get_goodvibes_e
+1. get_goodvibes_data
 2. get_frontierorbs
 3. get_polarizability
 4. get_dipole
@@ -36,14 +34,14 @@ Work in progress.
 14. get_chelpg
 15. get_hirshfeld
 16. get_pyramidalization
+17. get_planeangle
+18. get_time
 
 ## Non-parallelized Functions
 
-1. get_time
-2. get_IR
-3. get_sterimol_dbstep
-4. get_sterimol2vec
-5. get_planeangle
+1. get_IR
+2. get_sterimol_dbstep
+3. get_sterimol2vec
 
 ## To-do
 
