@@ -188,134 +188,6 @@ def get_enthalpies(dataframe): # gets thermochemical data from freq jobs
     print("Enthalpies function has completed")
     return(pd.concat([dataframe, enthalpy_dataframe], axis = 1))
 
-def get_time(dataframe): # gets wall time and CPU for all jobs
-    time_dataframe = pd.DataFrame(columns=[]) #define an empty df to place results in
-
-    for index, row in dataframe.iterrows(): #iterate over the dataframe
-        try: #try to get the data
-            log_file = row['log_name'] #read file name from df
-            filecont, error = get_filecont(log_file) #read the contents of the log file
-            if error != "":
-                print(error)
-                row_i = {'CPU_time_total(hours)': "no data", 'Wall_time_total(hours)': "no data"}
-                time_dataframe = time_dataframe.append(row_i, ignore_index=True)
-                continue
-
-            cputime,walltime = 0,0
-            timeout = []
-            for line in filecont:
-                if cputime_pattern.search(line):
-                    lsplt = str.split(line)
-                    cputime = float(lsplt[-2])/3600 + float(lsplt[-4])/60 + float(lsplt[-6]) + float(lsplt[-8])*24
-                    timeout.append(round(cputime,5))
-                if walltime_pattern.search(line):
-                    lsplt = str.split(line)
-                    walltime = float(lsplt[-2])/3600 + float(lsplt[-4])/60 + float(lsplt[-6]) + float(lsplt[-8])*24
-                    timeout.append(walltime)
-            CPU_time = 0
-            Wall_time = 0
-            for i in range(len(timeout)):
-                if i%2 == 0:
-                    CPU_time += timeout[i]
-                if i%2 != 0:
-                    Wall_time += timeout[i]
-
-            #this adds the data from the CPU_time and Wall_time into the property df
-            row_i = {'CPU_time_total(hours)': CPU_time, 'Wall_time_total(hours)': Wall_time}
-            time_dataframe = time_dataframe.append(row_i, ignore_index=True)
-        except:
-            print('****Unable to acquire CPU time and wall time for:', row['log_name'], ".log")
-            row_i = {'CPU_time_total(hours)': "no data", 'Wall_time_total(hours)': "no data"}
-            time_dataframe = time_dataframe.append(row_i, ignore_index=True)
-    print("Time function has completed")
-    return(pd.concat([dataframe, time_dataframe], axis = 1))
-
-def get_planeangle(dataframe,planeangle_list): # a function to get the plane angles for all atoms (dihederal_list, form [[O2, C1, O3, H5], [C4, C1, O3, H5]]) in a dataframe that contains file name and atom number
-    planeangle_dataframe = pd.DataFrame(columns=[]) #define an empty df to place results in
-
-    for index, row in dataframe.iterrows(): #iterate over the dataframe
-        try:
-            #parsing the plane angle list from input line
-            planeanglenums_list = []
-            for planeangle in planeangle_list:
-                atomnum_list = [] #the atom numbers for a plane angle (i.e. 18 16 17 50) are collected from the df using the input list (i.e.["O2", "C1", "O3", "H5"])
-                for atom in planeangle:
-                    atomnum = row[str(atom)]
-                    atomnum_list.append(str(atomnum))
-                planeanglenums_list.append(atomnum_list) #append atomnum_list for each plane angle to make a list of the form [['18', '16', '17', '50'], ['18', '16', '17', '50']]
-
-            planeangletitle_list = []
-            for planeangle in planeangle_list:
-                planeangletitle = str(planeangle[0]) + "_" + str(planeangle[1]) + "_" + str(planeangle[2]) + "_&_" +str(planeangle[3])+ "_" + str(planeangle[4]) + "_" +str(planeangle[5])
-                planeangletitle_list.append(planeangletitle)
-
-            log_file = row['log_name'] #read file name from df
-            streams, error = get_outstreams(log_file)
-            if error != "":
-                print(error)
-                row_i = {}
-                for a in range(0, len(planeanglenums_list)):
-                    entry = {'planeangle_'+str(planeangletitle_list[a]) + '(°)': "no data"}
-                    row_i.update(entry)
-                planeangle_dataframe = planeangle_dataframe.append(row_i, ignore_index=True)
-                continue
-
-            geom = get_geom(streams)
-
-
-            #checks for if the wrong number of atoms are input, input is not of the correct form, or calls atom numbers that do not exist in the molecule.
-            error = ""
-            for planeangle in planeanglenums_list:
-                if len(planeangle)%6 != 0:
-                    error = "****Number of atom inputs given for plane angle is not divisible by six. " + str(len(planeangle)) + " atoms were given. "
-                for atom in planeangle:
-                    if not atom.isdigit():
-                        error += "**** " + atom + ": Only numbers accepted as input for plane angles"
-                    if int(atom) > len(geom):
-                        error += "**** " + atom + " is out of range. Maximum valid atom number: " + str(len(geom)+1) + " "
-                if error != "": print(error)
-
-            planeanglesout = []
-            for planeangle in planeanglenums_list:
-                a = geom[int(planeangle[0])-1][:4]
-                b = geom[int(planeangle[1])-1][:4]
-                c = geom[int(planeangle[2])-1][:4]
-                d = geom[int(planeangle[3])-1][:4]
-                e = geom[int(planeangle[4])-1][:4]
-                f = geom[int(planeangle[5])-1][:4]
-
-                ab = np.array([a[1]-b[1],a[2]-b[2],a[3]-b[3]]) # Vectors
-                bc = np.array([b[1]-c[1],b[2]-c[2],b[3]-c[3]])
-                de = np.array([d[1]-e[1],d[2]-e[2],d[3]-e[3]])
-                ef = np.array([e[1]-f[1],e[2]-f[2],e[3]-f[3]])
-
-                n1 = np.cross(ab,bc) # Normal vectors
-                n2 = np.cross(de,ef)
-
-                planeangle_value = round(np.degrees(np.arccos(np.dot(n1,n2) / (np.linalg.norm(n1)*np.linalg.norm(n2)))),3)
-                planeangle_value = min(abs(planeangle_value),abs(180-planeangle_value))
-                planeanglesout.append(planeangle_value)
-
-
-            #this adds the data from the planeanglesout into the new property df
-            row_i = {}
-            for a in range(0, len(planeanglenums_list)):
-                entry = {'planeangle_'+str(planeangletitle_list[a]) + '(°)': planeanglesout[a]}
-                row_i.update(entry)
-            planeangle_dataframe = planeangle_dataframe.append(row_i, ignore_index=True)
-        except:
-            print('****Unable to acquire plane angle for:', row['log_name'], ".log")
-            row_i = {}
-            try:
-                for a in range(0, len(planeanglenums_list)):
-                    entry = {'planeangle_'+str(planeangletitle_list[a]) + '(°)': "no data"}
-                    row_i.update(entry)
-                planeangle_dataframe = planeangle_dataframe.append(row_i, ignore_index=True)
-            except:
-                print("****Ope, there's a problem with your atom inputs.")
-    print("Plane angle function has completed for", planeangle_list)
-    return(pd.concat([dataframe, planeangle_dataframe], axis = 1))
-
 class IR:
     def __init__(self,filecont,start,col,len):
         self.freqno = int(filecont[start].split()[-3+col])
@@ -329,7 +201,6 @@ class IR:
             y = float(filecont[start+7+a].split()[3*col+3])
             z = float(filecont[start+7+a].split()[3*col+4])
             self.deltas.append(np.linalg.norm([x,y,z]))
-
 
 def get_IR(dataframe, a1, a2, freqmin, freqmax, intmin, intmax, threshold): # a function to get IR values for a pair of atoms at a certain freq and intensity
     IR_dataframe = pd.DataFrame(columns=[]) #define an empty df to place results in
@@ -383,10 +254,6 @@ def get_IR(dataframe, a1, a2, freqmin, freqmax, intmin, intmax, threshold): # a 
             IR_dataframe = IR_dataframe.append(row_i, ignore_index=True)
     print("IR function has completed for", a1, "and", a2)
     return(pd.concat([dataframe, IR_dataframe], axis = 1))
-
-
-
-
 
 def get_cone_angle(dataframe, a_list): #DOES NOT MATCH VALUES FROM LITERATURE, WORK IN PROGRESS
     cone_angle_dataframe = pd.DataFrame(columns=[])

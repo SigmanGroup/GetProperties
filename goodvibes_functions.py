@@ -2,108 +2,209 @@
 # coding: utf-8
 
 '''
-Isolated GoodVibes functions
+Functions specifically for the GoodVibes thermochemical extraction
 '''
 
+import sys
+import logging
 import itertools
 import multiprocessing
 
 from pathlib import Path
-import pandas as pd
 
-import goodvibes
-import goodvibes.GoodVibes as gv
-print(gv.GVOptions())
-import goodvibes.thermo as thermo
-import goodvibes.io as io
+import pandas as pd
+from GoodVibes.goodvibes.GoodVibes import ATMOS, GAS_CONSTANT
+from GoodVibes.goodvibes.io import level_of_theory
+from GoodVibes.goodvibes.thermo import calc_bbe
+from GoodVibes.goodvibes.vib_scale_factors import scaling_data_dict, scaling_data_dict_mod
 
 from utils import FILE_COLUMN_NAME
+from utils import configure_logger
 
-def _run_goodvibes(file: Path, options) -> pd.DataFrame:
+logger = logging.getLogger(__name__)
+
+# Format the logging (you don't have to edit this)
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='[%(levelname)-5s - %(asctime)s] [%(module)s] %(message)s',
+    datefmt='%m/%d/%Y:%H:%M:%S',  # Correct way to format the date
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
+
+def _get_goodvibes_freq_scale_factor(file: Path):
     '''
-    Runs GoodVibes on a single file and returns a pd.DataFrame
-    containing the log_name and a series of thermochemical features
-    from GoodVibes.
+    Replicate the GoodVibes 3.2 automatic vibrational scale-factor lookup.
+
+    Parameters
+    ----------
+    filename: str
+        Output file to inspect.
+
+    Returns
+    -------
+    freq_scale_factor: float
+        Vibrational scale factor used by GoodVibes.
     '''
-    # create a text file for all output (required)
-    logger = io.Logger("Goodvibes", 'output', False)
+    configure_logger(debug=False)
+
+    # Detect the level of theory the same way GoodVibes does.
+    level = level_of_theory(file=file).upper()
+
+    # Search the built-in GoodVibes scale-factor tables.
+    for data in (scaling_data_dict, scaling_data_dict_mod):
+        if level in data:
+            logger.info('Found %s in GoodVibes scaling data.\tzpe_fac: %f', level, data[level].zpe_fac)
+            return data[level].zpe_fac
+
+    # Match the GoodVibes fallback when no match is found.
+    logger.warning('Defaulting to zpe_fac = 1.0 for %s', level)
+    return 1.0
 
 
+def _get_goodvibes_thermo_data(logfile: Path | str,
+                               temp: float = 298.15,
+                               spc: str = 'link'):
+    '''
+    Helper function that mimics the old GoodVibes workflow and returns
+    thermochemical data as a dict.
+
+    Parameters
+    ----------
+    logfile: str
+        Gaussian/ORCA output file path. A bare stem is also accepted.
+
+    temp: float
+        Temperature in Kelvin.
+
+    spc: str
+        Single-point correction mode. Use 'link' to match the old code.
+
+    Returns
+    -------
+    thermo_data: dict
+        Thermochemical data extracted from the GoodVibes calc_bbe object.
+    '''
     try:
-        file_data = io.getoutData(str(file.absolute()), options)
+        # Match the GoodVibes gas-phase default concentration when -c is not supplied.
+        conc = ATMOS / (GAS_CONSTANT * temp)
 
-        # Carry out the thermochemical analysis - auto-detect the vibrational scaling factor
-        # Turns of default value of 1
-        options.freq_scale_factor = False
-        level_of_theory = [file_data.functional + '/' + file_data.basis_set]
-        options.freq_scale_factor, options.mm_freq_scale_factor = gv.get_vib_scale_factor(level_of_theory, options, logger)
-        bbe_val = thermo.calc_bbe(file_data, options)
+        # Match GoodVibes automatic vibrational scale-factor detection.
+        freq_scale_factor = _get_goodvibes_freq_scale_factor(logfile)
 
-        properties = ['sp_energy', 'zpe', 'enthalpy', 'entropy', 'qh_entropy', 'gibbs_free_energy', 'qh_gibbs_free_energy']
-        vals = [getattr(bbe_val, k) for k in properties]
+        # Call the real GoodVibes 3.2 thermochemistry engine directly.
+        bbe = calc_bbe(
+            file=logfile,
+            QS='grimme',
+            QH=False,
+            s_freq_cutoff=100.0,
+            H_FREQ_CUTOFF=100.0,
+            temperature=temp,
+            conc=conc,
+            freq_scale_factor=freq_scale_factor,
+            solv='none',
+            spc=spc,
+            invert=False,
+            d3_term=0.0,
+            cosmo=None,
+            ssymm=False,
+            mm_freq_scale_factor=False,
+            inertia='global',
+            g4=False,
+            glowfreq=''
+        )
 
-        row_i = pd.Series({
-                FILE_COLUMN_NAME: file.name,
-                'E_spc (Hartree)': vals[0],
-                'ZPE(Hartree)': vals[1],
-                'H_spc(Hartree)': vals[2],
-                'T*S': vals[3]*options.temperature,
-                'T*qh_S': vals[4]*options.temperature,
-                'G(T)_spc(Hartree)': vals[5],
-                'qh_G(T)_spc(Hartree)': vals[6],
-                'T': options.temperature})
+        # Return the same values the old version
+        thermo_data =  pd.Series({
+            FILE_COLUMN_NAME: logfile.name,
+            'E_spc (Hartree)': bbe.sp_energy,
+            'ZPE(Hartree)': bbe.zpe,
+            'H_spc(Hartree)': bbe.enthalpy,
+            'T*S': bbe.entropy * temp,
+            'T*qh_S': bbe.qh_entropy * temp,
+            'G(T)_spc(Hartree)': bbe.gibbs_free_energy,
+            'qh_G(T)_spc(Hartree)': bbe.qh_gibbs_free_energy,
+            'T': temp
+        })
 
     except Exception as e:
-        print(f'An exception has occurred: {e}')
-        print(f'[ERROR] Unable to acquire GoodVibes energies for {file.name}')
-        row_i = pd.Series({
-                            FILE_COLUMN_NAME: file.name,
-                            'E_spc (Hartree)': "no data",
-                            'ZPE(Hartree)': "no data",
-                            'H_spc(Hartree)': "no data",
-                            'T*S': "no data",
-                            'T*qh_S': "no data",
-                            'G(T)_spc(Hartree)': "no data",
-                            'qh_G(T)_spc(Hartree)': "no data",
-                            'T': "no data"})
+        logger.error('Could not get GoodVibes thermochemical data for %s because %s', logfile.name, e)
+        thermo_data =  pd.Series({
+            FILE_COLUMN_NAME: logfile.name,
+            'E_spc (Hartree)': None,
+            'ZPE(Hartree)': None,
+            'H_spc(Hartree)': None,
+            'T*S': None,
+            'T*qh_S': None,
+            'G(T)_spc(Hartree)': None,
+            'qh_G(T)_spc(Hartree)': None,
+            'T': temp
+        })
 
-    return pd.DataFrame(row_i).transpose()
+    return pd.DataFrame(thermo_data).transpose()
 
-def get_goodvibes_e(dataframe: pd.DataFrame,
-                    data_dir: Path,
-                    temp: float = 298.15,
-                    procs: int = 1) -> pd.DataFrame:
+
+def get_goodvibes_data(dataframe: pd.DataFrame,
+                       data_dir: Path,
+                       temp: float = 298.15,
+                       procs: int = 1):
     '''
-    Runs GoodVibes on a dataframe containing the log_name column. These
-    files should be found in the data_dir.
+    Extracts the following properties
+
+    E_spc (Hartree)
+    ZPE(Hartree)
+    H_spc(Hartree)
+    T*S
+    T*qh_S
+    G(T)_spc(Hartree)
+    qh_G(T)_spc(Hartree)
+    T
+
+    Parameters
+    ----------
+    dataframe: pd.DataFrame
+        DataFrame containing <FILE_COLUMN_NAME> column
+
+    data_dir: Path
+        Directory where the files are located
+
+    temp: float
+        Temperature in Kelvin
+
+    procs: int
+        Number of processors
+
+    Returns
+    ----------
+    pd.DataFrame
+        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        the resultant descriptors
     '''
-    # Make a results dataframe
-    e_dataframe = pd.DataFrame(columns=[FILE_COLUMN_NAME, 'E_spc (Hartree)', 'ZPE(Hartree)', 'H_spc(Hartree)', 'T*S', 'T*qh_S', 'G(T)_spc(Hartree)', 'qh_G(T)_spc(Hartree)', 'T'])
-
-    # Set goodvibes options
-    options = gv.GVOptions()
-    options.spc = 'link'
-    options.temperature = temp
-
     files = [Path(data_dir / x) for x in dataframe[FILE_COLUMN_NAME].to_list()]
 
-    # Multiprocessing goodvibes is difficult because it will pickle some
-    # strange objects and try to import everything a million times.
+    args = zip(files,
+            itertools.repeat(temp),
+            itertools.repeat('link'))
+
     with multiprocessing.Pool(processes=procs) as p:
-        results = p.starmap(_run_goodvibes, zip(files, itertools.repeat(options)))
+        results = p.starmap(_get_goodvibes_thermo_data, args)
 
-    #results = []
-    #for file in files:
-    #    results.append(_run_goodvibes(file, options=options))
+    results = pd.concat(results)
 
-    e_dataframe = pd.concat(results)
-
-    print('[INFO] Goodvibes has completed.')
-
-    # Merge the old and new dataframes based on the log name
-    e_dataframe.set_index(FILE_COLUMN_NAME, inplace=True, drop=True)
+    results.set_index(FILE_COLUMN_NAME, inplace=True, drop=True)
     dataframe.set_index(FILE_COLUMN_NAME, inplace=True, drop=True)
 
-    dataframe = pd.concat([dataframe, e_dataframe], axis=1)
+    dataframe = pd.concat([dataframe, results], axis=1)
     dataframe.reset_index(inplace=True)
+
+    logger.info('GoodVibes function completed.')
     return dataframe
+
+
+if __name__ == "__main__":
+
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='[%(levelname)-5s - %(asctime)s] [%(module)s] %(message)s',
+        datefmt='%m/%d/%Y:%H:%M:%S',  # Correct way to format the date
+        handlers=[logging.StreamHandler(sys.stdout)]
+    )
