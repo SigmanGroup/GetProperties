@@ -58,3 +58,10 @@ molecule while regular sterimol is calculated if `radius` is `None`
 - Logfiles are automatically converted if a .mol file
 - Logfiles can be in any directory instead of the same directory as the Jupyter notebook
 - Substructure atom mapping now includes 3D structure viewing
+
+## Contributors
+
+- James R. Howard, PhD
+- Brittany C. Haas, PhD
+- Melissa A. Hardy, PhD
+- Jordan P. Liles, PhD

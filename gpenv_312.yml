@@ -10,10 +10,11 @@ dependencies:
   - numpy
   - pandas
   - scipy
-  - morfeus-ml
+  - morfeus-ml=0.8.0
   - pip
-  - rdkit=2025.09.6
+  - rdkit=2025.03.6
   - matplotlib 3.10.8
+  - openbabel=3.1.1
   - pip:
       - goodvibes
       - dbstep==1.1.0
