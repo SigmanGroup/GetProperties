@@ -1946,6 +1946,8 @@ def _get_plane_angle(row: pd.Series,
     e = np.array(geom[plane_b_indices[1]][1:])
     f = np.array(geom[plane_b_indices[2]][1:])
 
+    print(a)
+
     # Construct the same vectors used in the original function
     ab = np.array([a[1] - b[1], a[2] - b[2], a[3] - b[3]], dtype=float)
     bc = np.array([b[1] - c[1], b[2] - c[2], b[3] - c[3]], dtype=float)
