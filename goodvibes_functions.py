@@ -13,10 +13,10 @@ import multiprocessing
 from pathlib import Path
 
 import pandas as pd
-from GoodVibes.goodvibes.GoodVibes import ATMOS, GAS_CONSTANT
-from GoodVibes.goodvibes.io import level_of_theory
-from GoodVibes.goodvibes.thermo import calc_bbe
-from GoodVibes.goodvibes.vib_scale_factors import scaling_data_dict, scaling_data_dict_mod
+from goodvibes.GoodVibes import ATMOS, GAS_CONSTANT
+from goodvibes.io import level_of_theory
+from goodvibes.thermo import calc_bbe
+from goodvibes.vib_scale_factors import scaling_data_dict, scaling_data_dict_mod
 
 from utils import FILE_COLUMN_NAME
 from utils import configure_logger

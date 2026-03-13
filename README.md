@@ -6,7 +6,7 @@ This repository contains an updated version of the Sigman group's "Get_Propertie
 
 1. Create a conda environment using the  gpenv_312.yml file. <br>
 
-    `conda env create -f gpenv_311.yml`
+    `conda env create -f gpenv_312.yml`
 
 2. Activate the environment and use the notebook. <br>
 

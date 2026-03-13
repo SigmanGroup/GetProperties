@@ -1928,56 +1928,56 @@ def _get_plane_angle(row: pd.Series,
     # Set up the results dictionary
     results = {f'plane_angle_{"-".join(plane_a_names)}_{"-".join(plane_b_names)} (º)': None}
 
-    try:
-        # Get the geometry
-        geom = get_geom(streams=streams)
+    #try:
+    # Get the geometry
+    geom = get_geom(streams=streams)
 
-        # Get the planes as 0-index
-        plane_a_indices = [x - 1 for x in plane_a_indices]
-        plane_b_indices = [x - 1 for x in plane_b_indices]
+    # Get the planes as 0-index
+    plane_a_indices = [x - 1 for x in plane_a_indices]
+    plane_b_indices = [x - 1 for x in plane_b_indices]
 
-        # Get the xyz coordinates of the planes
-        # We use everything from 1 and onward because 0th index is atomic symbol
-        a = np.array(geom[plane_a_indices[0][1:]])
-        b = np.array(geom[plane_a_indices[1][1:]])
-        c = np.array(geom[plane_a_indices[2][1:]])
+    # Get the xyz coordinates of the planes
+    # We use everything from 1 and onward because 0th index is atomic symbol
+    a = np.array(geom[plane_a_indices[0]][1:])
+    b = np.array(geom[plane_a_indices[1]][1:])
+    c = np.array(geom[plane_a_indices[2]][1:])
 
-        d = np.array(geom[plane_b_indices[0][1:]])
-        e = np.array(geom[plane_b_indices[1][1:]])
-        f = np.array(geom[plane_b_indices[2][1:]])
+    d = np.array(geom[plane_b_indices[0]][1:])
+    e = np.array(geom[plane_b_indices[1]][1:])
+    f = np.array(geom[plane_b_indices[2]][1:])
 
-        # Construct the same vectors used in the original function
-        ab = np.array([a[1] - b[1], a[2] - b[2], a[3] - b[3]], dtype=float)
-        bc = np.array([b[1] - c[1], b[2] - c[2], b[3] - c[3]], dtype=float)
-        de = np.array([d[1] - e[1], d[2] - e[2], d[3] - e[3]], dtype=float)
-        ef = np.array([e[1] - f[1], e[2] - f[2], e[3] - f[3]], dtype=float)
+    # Construct the same vectors used in the original function
+    ab = np.array([a[1] - b[1], a[2] - b[2], a[3] - b[3]], dtype=float)
+    bc = np.array([b[1] - c[1], b[2] - c[2], b[3] - c[3]], dtype=float)
+    de = np.array([d[1] - e[1], d[2] - e[2], d[3] - e[3]], dtype=float)
+    ef = np.array([e[1] - f[1], e[2] - f[2], e[3] - f[3]], dtype=float)
 
-        # Compute normal vectors exactly as in the original function
-        n1 = np.cross(ab, bc)
-        n2 = np.cross(de, ef)
+    # Compute normal vectors exactly as in the original function
+    n1 = np.cross(ab, bc)
+    n2 = np.cross(de, ef)
 
-        # Guard against collinear atoms giving zero normal vectors
-        n1_norm = np.linalg.norm(n1)
-        n2_norm = np.linalg.norm(n2)
-        if n1_norm == 0 or n2_norm == 0:
-            logger.error('Unable to compute plane angle for %s because one plane is degenerate.', file.name)
+    # Guard against collinear atoms giving zero normal vectors
+    n1_norm = np.linalg.norm(n1)
+    n2_norm = np.linalg.norm(n2)
+    if n1_norm == 0 or n2_norm == 0:
+        logger.error('Unable to compute plane angle for %s because one plane is degenerate.', file.name)
 
-        # Compute the raw plane angle
-        cos_theta = np.dot(n1, n2) / (n1_norm * n2_norm)
+    # Compute the raw plane angle
+    cos_theta = np.dot(n1, n2) / (n1_norm * n2_norm)
 
-        # Clamp for numerical stability (removes issues with floating point arithmetic)
-        cos_theta = np.clip(cos_theta, -1.0, 1.0)
+    # Clamp for numerical stability (removes issues with floating point arithmetic)
+    cos_theta = np.clip(cos_theta, -1.0, 1.0)
 
-        # Round to 3 decimal points
-        raw_angle = round(float(np.degrees(np.arccos(cos_theta))), 3)
+    # Round to 3 decimal points
+    raw_angle = round(float(np.degrees(np.arccos(cos_theta))), 3)
 
-        # Force selection of smallest angle regardless of sign
-        plane_angle = min(abs(raw_angle), abs(180 - raw_angle))
+    # Force selection of smallest angle regardless of sign
+    plane_angle = min(abs(raw_angle), abs(180 - raw_angle))
 
-        results = {f'plane_angle_{"-".join(plane_a_names)}_{"-".join(plane_b_names)} (º)': plane_angle}
+    results = {f'plane_angle_{"-".join(plane_a_names)}_{"-".join(plane_b_names)} (º)': plane_angle}
 
-    except Exception as e:
-        logger.error('Could not compute plane angle for %s because %s', file.name, e)
+    #except Exception as e:
+    #    logger.error('Could not compute plane angle for %s because %s', file.name, e)
 
     return pd.DataFrame(pd.Series(results))
 
