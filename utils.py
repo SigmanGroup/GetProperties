@@ -360,6 +360,29 @@ def draw_3D_mol(mol: Mol,
     view.show()
 
 
+def split_compound_name(file: str | Path,
+                        delimiter: str,
+                        return_key: int = 0) -> str:
+    '''
+    Helper function that splits a file stem into separate parts based
+    on a delimiter and returns the portion of the split string based on
+    the return key.
+
+    Parameters
+    ----------
+    file: str | Path
+        Path to the file or just the filename
+
+    delimiter: str
+        Character on which we will split the name
+
+    return_key: int
+        The key of the list of the string split that is returned
+    '''
+    stem = Path(file).stem
+    return str(stem.split(delimiter)[return_key])
+
+
 def configure_logger(debug: bool = False) -> None:
     '''
     Configure logging for the current process.

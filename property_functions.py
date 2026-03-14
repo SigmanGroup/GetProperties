@@ -79,11 +79,11 @@ def _get_frontier_orbs(file: Path) -> pd.DataFrame:
         if error != "":
             logger.error('Error reading in %s\t%s', file.name, error)
             row_i = pd.Series({FILE_COLUMN_NAME: file.name,
-                               'HOMO': "no data",
-                               'LUMO': "no data",
-                               "μ": "no data",
-                               "η": "no data",
-                               "ω": "no data"})
+                               'HOMO': None,
+                               'LUMO': None,
+                               "μ": None,
+                               "η": None,
+                               "ω": None})
         else:
             frontierout = []
             index = 0
@@ -107,7 +107,7 @@ def _get_frontier_orbs(file: Path) -> pd.DataFrame:
 
     except Exception as e:
         logger.error('Exception in _get_frontier_orbs for %s\t%s', file.name, e)
-        row_i = pd.Series({FILE_COLUMN_NAME:file.name, 'HOMO': "no data", 'LUMO': "no data", "μ": "no data", "η": "no data", "ω": "no data"})
+        row_i = pd.Series({FILE_COLUMN_NAME:file.name, 'HOMO': None, 'LUMO': None, "μ": None, "η": None, "ω": None})
 
     return pd.DataFrame(row_i).transpose()
 
@@ -177,7 +177,7 @@ def _get_polarizability(file: Path) -> pd.DataFrame:
 
         if error != "":
             logger.error('Error in _get_polarizability: %s\t%s', file.name, error)
-            row_i = pd.Series({FILE_COLUMN_NAME:file.name, 'polar_iso(au)': "no data", 'polar_aniso(au)': "no data"})
+            row_i = pd.Series({FILE_COLUMN_NAME:file.name, 'polar_iso(au)': None, 'polar_aniso(au)': None})
 
         else:
             matches = re.findall(POLARIZABILITY_TABLE_PATTERN, filecont)
@@ -196,7 +196,7 @@ def _get_polarizability(file: Path) -> pd.DataFrame:
 
     except Exception as e:
         logger.error('Unable to acquire polarizability for: %s because %s', file.name, e)
-        row_i = pd.Series({FILE_COLUMN_NAME:file.name, 'polar_iso(Debye)': "no data", 'polar_aniso(Debye)': "no data"})
+        row_i = pd.Series({FILE_COLUMN_NAME:file.name, 'polar_iso(Debye)': None, 'polar_aniso(Debye)': None})
 
     return pd.DataFrame(row_i).transpose()
 
@@ -263,7 +263,7 @@ def _get_dipole(file: Path) -> pd.DataFrame:
         filecont, error = get_filecont(file, split=True) #read the contents of the log file
         if error != "":
             logger.error('Error in _get_polarizability: %s\t%s', file.name, error)
-            row_i = pd.Series({FILE_COLUMN_NAME:file.name, 'dipole(Debye)': "no data"})
+            row_i = pd.Series({FILE_COLUMN_NAME:file.name, 'dipole(Debye)': None})
         else:
             dipole = []
             for i in range(len(filecont) - 1, 0, -1): #search filecont in backwards direction
@@ -273,7 +273,7 @@ def _get_dipole(file: Path) -> pd.DataFrame:
             row_i = pd.Series({FILE_COLUMN_NAME:file.name, 'dipole(Debye)': dipole[0]})
     except Exception as e:
         logger.error('Unable to acquire dipole for: %s because %s', file.name, e)
-        row_i = pd.Series({FILE_COLUMN_NAME:file.name, 'dipole(Debye)': "no data"})
+        row_i = pd.Series({FILE_COLUMN_NAME:file.name, 'dipole(Debye)': None})
 
     return pd.DataFrame(row_i).transpose()
 
@@ -340,7 +340,7 @@ def _get_volume(file: Path) -> pd.DataFrame:
         filecont, error = get_filecont(file, split=True) #read the contents of the log file
         if error != "":
             logger.error('Error in _get_volume: %s\t%s', file.name, error)
-            row_i = pd.Series({FILE_COLUMN_NAME: file.name, 'volume(Bohr_radius³/mol)': "no data"})
+            row_i = pd.Series({FILE_COLUMN_NAME: file.name, 'volume(Bohr_radius³/mol)': None})
 
         else:
             volume = []
@@ -352,7 +352,7 @@ def _get_volume(file: Path) -> pd.DataFrame:
 
     except Exception as e:
         logger.error('Unable to acquire volume for: %s because %s', file.name, e)
-        row_i = pd.Series({FILE_COLUMN_NAME: file.name, 'volume(Bohr_radius³/mol)': "no data"})
+        row_i = pd.Series({FILE_COLUMN_NAME: file.name, 'volume(Bohr_radius³/mol)': None})
 
     return pd.DataFrame(row_i).transpose()
 
@@ -423,9 +423,9 @@ def _get_SASA(file: Path) -> pd.DataFrame:
             if error != "":
                 logger.error('Error in _get_sasa: %s\t%s', file.name, error)
                 row_i = pd.Series({FILE_COLUMN_NAME:file.name,
-                                'SASA_surface_area(Å²)': "no data",
-                                'SASA_volume(Å³)': "no data",
-                                'SASA_sphericity': "no data"})
+                                'SASA_surface_area(Å²)': None,
+                                'SASA_volume(Å³)': None,
+                                'SASA_sphericity': None})
             else:
                 log_coordinates = get_geom(streams)
                 elements = np.array([log_coordinates[i][0] for i in range(len(log_coordinates))])
@@ -442,9 +442,9 @@ def _get_SASA(file: Path) -> pd.DataFrame:
     except Exception as e:
         logger.error('Unable to acquire SASA for: %s because %s', file.name, e)
         row_i = pd.Series({FILE_COLUMN_NAME:file.name,
-                            'SASA_surface_area(Å²)': "no data",
-                            'SASA_volume(Å³)': "no data",
-                            'SASA_sphericity': "no data"})
+                            'SASA_surface_area(Å²)': None,
+                            'SASA_volume(Å³)': None,
+                            'SASA_sphericity': None})
 
     return pd.DataFrame(row_i).transpose()
 
@@ -516,7 +516,7 @@ def _get_nbo(row: pd.Series) -> pd.DataFrame:
     row[FILE_COLUMN_NAME] = Path(row[FILE_COLUMN_NAME])
 
     # Get a results dictionary that contains all the keys of the atoms we're looking at
-    results = {f'NBO_charge_{k}': 'no data' for k in [x for x in row.keys() if FILE_COLUMN_NAME not in x]}
+    results = {f'NBO_charge_{k}': None for k in [x for x in row.keys() if FILE_COLUMN_NAME not in x]}
 
     file = Path(row[FILE_COLUMN_NAME])
 
@@ -525,7 +525,7 @@ def _get_nbo(row: pd.Series) -> pd.DataFrame:
         filecont, error = get_filecont(file, split=True)
         if error != "":
             for k in results.keys():
-                results[k] = 'no data'
+                results[k] = None
         else:
             nbo, nbostart, nboout, skip = [], 0, "", 0
 
@@ -546,7 +546,7 @@ def _get_nbo(row: pd.Series) -> pd.DataFrame:
             if nbostart == 0:
                 logger.error('Error in _get_nbo. No NPA found in %s.', file.name)
                 for k in results.keys():
-                    results[k] = 'no data'
+                    results[k] = None
             else:
 
                 #this section splits the table where nbo data is located into just
@@ -767,7 +767,7 @@ def _get_distance(row: pd.Series, dist_list: list[list]) -> pd.Series:
     atom_number_name_dict = {int(number):label for label, number in row.items() if label != FILE_COLUMN_NAME}
     #atom_name_number_dict = {label:int(number) for label, number in row.items() if label != FILE_COLUMN_NAME}
 
-    results = {f'distance_{k[0]}_{k[1]}(Å)': 'no data' for k in dist_list}
+    results = {f'distance_{k[0]}_{k[1]}(Å)': None for k in dist_list}
 
     file = Path(row[FILE_COLUMN_NAME])
 
@@ -775,7 +775,7 @@ def _get_distance(row: pd.Series, dist_list: list[list]) -> pd.Series:
         filecont, error = get_filecont(file, split=True) # Read the contents of the log file
         if error != "":
             for k in results.keys():
-                results[k] = 'no data'
+                results[k] = None
         else:
             streams, error = get_outstreams(file)
 
@@ -894,7 +894,7 @@ def _get_angles(row: pd.Series, angle_list: list[list]) -> pd.Series:
     # Get a results dictionary that contains all the keys of the atoms we're looking at
     atom_number_name_dict = {int(number): label for label, number in row.items() if label != FILE_COLUMN_NAME}
 
-    results = {f'angle_{k[0]}_{k[1]}_{k[2]}(°)':'no data' for k in angle_list}
+    results = {f'angle_{k[0]}_{k[1]}_{k[2]}(°)':None for k in angle_list}
 
     file = Path(row[FILE_COLUMN_NAME])
 
@@ -902,7 +902,7 @@ def _get_angles(row: pd.Series, angle_list: list[list]) -> pd.Series:
         filecont, error = get_filecont(file, split=True) #read the contents of the log file
         if error != "":
             for k in results.keys():
-                results[k] = 'no data'
+                results[k] = None
         else:
             streams, error = get_outstreams(file)
 
@@ -1025,7 +1025,7 @@ def _get_dihedral(row: pd.Series, dihedral_list: list[list]) -> pd.Series:
     # Get a results dictionary that contains all the keys of the atoms we're looking at
     atom_number_name_dict = {int(number):label for label, number in row.items() if label != FILE_COLUMN_NAME}
 
-    results = {f'dihedral_{k[0]}_{k[1]}_{k[2]}_{k[3]} (°)':'no data' for k in dihedral_list}
+    results = {f'dihedral_{k[0]}_{k[1]}_{k[2]}_{k[3]} (°)':None for k in dihedral_list}
 
     file = Path(row[FILE_COLUMN_NAME])
 
@@ -1033,7 +1033,7 @@ def _get_dihedral(row: pd.Series, dihedral_list: list[list]) -> pd.Series:
         filecont, error = get_filecont(file, split=True) #read the contents of the log file
         if error != "":
             for k in results.keys():
-                results[k] = 'no data'
+                results[k] = None
         else:
             streams, error = get_outstreams(file)
 
@@ -1163,24 +1163,32 @@ def _get_vbur(row: pd.Series,
     results = {}
     for atom in a_list:
         for radius in radii:
-            results[f'%Vbur_{atom}_{str(radius)}Å'] = 'no_data'
+            results[f'%Vbur_{atom}_{str(radius)}Å'] = None
 
     file = Path(row[FILE_COLUMN_NAME])
 
     try:
-        filecont, error = get_filecont(file, split=True)  # read the contents of the log file
+
+        filecont, error = get_filecont(file, split=True)
         if error != '':
+            logger.error('Error in _get_vbur. %s.', error)
+
+        else:
             streams, error = get_outstreams(file)
+
             if error != '':
                 logger.error('Error in _get_vbur. %s.', error)
             else:
+                # Get the geometry
+                # Note that that is [atomic_symbol, x, y, z]
                 geom = get_geom(streams)
+
+                # Separate the elements and coordinates
+                elements = np.array([x[0] for x in geom], dtype=str)
+                coordinates = np.array([x[1:] for x in geom], dtype=np.float64)
 
                 for atom in a_list:
                     for radius in radii:
-                        elements = np.array([geom[i][0] for i in range(len(geom))])
-
-                        coordinates = np.array([np.array(geom[i][1:]) for i in range(len(geom))])
 
                         vbur = BuriedVolume(elements, coordinates, int(row[atom]), include_hs=True, radius=radius)
 
@@ -1310,13 +1318,13 @@ def _get_sterimol_morfeus(row: pd.Series,
     results = {}
     for atom_pair in sterimol_list:
         if radius is None:
-            results[f'Sterimol_L_{atom_pair[0]}_{atom_pair[1]}(Å)_morfeus'] = 'no data'
-            results[f'Sterimol_B1_{atom_pair[0]}_{atom_pair[1]}(Å)_morfeus'] = 'no data'
-            results[f'Sterimol_B5_{atom_pair[0]}_{atom_pair[1]}(Å)_morfeus'] = 'no data'
+            results[f'Sterimol_L_{atom_pair[0]}_{atom_pair[1]}(Å)_morfeus'] = None
+            results[f'Sterimol_B1_{atom_pair[0]}_{atom_pair[1]}(Å)_morfeus'] = None
+            results[f'Sterimol_B5_{atom_pair[0]}_{atom_pair[1]}(Å)_morfeus'] = None
         else:
-            results[f'Buried_Sterimol_L_{atom_pair[0]}_{atom_pair[1]}_{radius}(Å)'] = 'no data'
-            results[f'Buried_Sterimol_B1_{atom_pair[0]}_{atom_pair[1]}_{radius}(Å)'] = 'no data'
-            results[f'Buried_Sterimol_B5_{atom_pair[0]}_{atom_pair[1]}_{radius}(Å)'] = 'no data'
+            results[f'Buried_Sterimol_L_{atom_pair[0]}_{atom_pair[1]}_{radius}(Å)'] = None
+            results[f'Buried_Sterimol_B1_{atom_pair[0]}_{atom_pair[1]}_{radius}(Å)'] = None
+            results[f'Buried_Sterimol_B5_{atom_pair[0]}_{atom_pair[1]}_{radius}(Å)'] = None
 
     # Get the file we're looking at
     file = Path(row[FILE_COLUMN_NAME])
@@ -1457,7 +1465,7 @@ def _get_chelpg(row: pd.Series, a_list: list[str]) -> pd.DataFrame:
     row[FILE_COLUMN_NAME] = Path(row[FILE_COLUMN_NAME])
 
     # Get a results dictionary that contains all the keys of the atoms we're looking at
-    results = {f'ChelpG_charge_{k}':'no data' for k in [x for x in row.keys() if FILE_COLUMN_NAME not in x]}
+    results = {f'ChelpG_charge_{k}':None for k in [x for x in row.keys() if FILE_COLUMN_NAME not in x]}
 
     file = Path(row[FILE_COLUMN_NAME])
 
@@ -1465,7 +1473,7 @@ def _get_chelpg(row: pd.Series, a_list: list[str]) -> pd.DataFrame:
         filecont, error = get_filecont(file, split=True)
         if error != "":
             for k in results.keys():
-                results[k] = 'no data'
+                results[k] = None
         else:
             chelpgstart, chelpg, error, chelpgout = 0, False, "", []
 
@@ -1575,9 +1583,9 @@ def _get_hirshfeld(row: pd.Series, a_list: list[str]) -> pd.DataFrame:
     # Get a results dictionary that contains all the keys of the atoms we're looking at
     results = {}
     for atom_label in [x for x in row.keys() if FILE_COLUMN_NAME not in x]:
-        results[f'Hirsh_charge_{atom_label}'] = 'no data'
-        results[f'Hirsh_CM5_charge_{atom_label}'] = 'no data'
-        results[f'Hirsh_atom_dipole_{atom_label}'] = 'no data'
+        results[f'Hirsh_charge_{atom_label}'] = None
+        results[f'Hirsh_CM5_charge_{atom_label}'] = None
+        results[f'Hirsh_atom_dipole_{atom_label}'] = None
 
     file = Path(row[FILE_COLUMN_NAME])
 
@@ -1585,7 +1593,7 @@ def _get_hirshfeld(row: pd.Series, a_list: list[str]) -> pd.DataFrame:
         filecont, error = get_filecont(file, split=True) #read the contents of the log file
         if error != "":
             for k in results.keys():
-                results[k] = 'no data'
+                results[k] = None
         else:
             hirshstart, error, hirshout = 0, '', []
 
@@ -1699,8 +1707,8 @@ def _get_pyramidalization(row: pd.Series,
     # Get a results dictionary that contains all the keys of the atoms we're looking at
     results = {}
     for atom_label in [x for x in row.keys() if FILE_COLUMN_NAME not in x]:
-        results[f'pyramidalization_Gavrish_{atom_label}_(°)'] = 'no data'
-        results[f'pyramidalization_Agranat-Radhakrishnan_{atom_label}'] = 'no data'
+        results[f'pyramidalization_Gavrish_{atom_label}_(°)'] = None
+        results[f'pyramidalization_Agranat-Radhakrishnan_{atom_label}'] = None
 
     file = Path(row[FILE_COLUMN_NAME])
 
@@ -1710,7 +1718,7 @@ def _get_pyramidalization(row: pd.Series,
 
         if error != "":
             for k in results.keys():
-                results[k] = 'no data'
+                results[k] = None
 
         else:
             streams, error = get_outstreams(file)
@@ -1927,61 +1935,60 @@ def _get_plane_angle(row: pd.Series,
 
     # Set up the results dictionary
     results = {f'plane_angle_{"-".join(plane_a_names)}_{"-".join(plane_b_names)} (º)': None}
+    results[FILE_COLUMN_NAME] = file.name
 
-    #try:
-    # Get the geometry
-    geom = get_geom(streams=streams)
+    try:
+        # Get the geometry
+        geom = get_geom(streams=streams)
 
-    # Get the planes as 0-index
-    plane_a_indices = [x - 1 for x in plane_a_indices]
-    plane_b_indices = [x - 1 for x in plane_b_indices]
+        # Get the planes as 0-index
+        plane_a_indices = [x - 1 for x in plane_a_indices]
+        plane_b_indices = [x - 1 for x in plane_b_indices]
 
-    # Get the xyz coordinates of the planes
-    # We use everything from 1 and onward because 0th index is atomic symbol
-    a = np.array(geom[plane_a_indices[0]][1:])
-    b = np.array(geom[plane_a_indices[1]][1:])
-    c = np.array(geom[plane_a_indices[2]][1:])
+        # Get the xyz coordinates of the planes
+        # We use everything from 1 and onward because 0th index is atomic symbol
+        a = np.array(geom[plane_a_indices[0]][1:])
+        b = np.array(geom[plane_a_indices[1]][1:])
+        c = np.array(geom[plane_a_indices[2]][1:])
 
-    d = np.array(geom[plane_b_indices[0]][1:])
-    e = np.array(geom[plane_b_indices[1]][1:])
-    f = np.array(geom[plane_b_indices[2]][1:])
+        d = np.array(geom[plane_b_indices[0]][1:])
+        e = np.array(geom[plane_b_indices[1]][1:])
+        f = np.array(geom[plane_b_indices[2]][1:])
 
-    print(a)
+        # Construct the same vectors used in the original function
+        ab = np.array([a[0] - b[0], a[1] - b[1], a[2] - b[2]], dtype=float)
+        bc = np.array([b[0] - c[0], b[1] - c[1], b[2] - c[2]], dtype=float)
+        de = np.array([d[0] - e[0], d[1] - e[1], d[2] - e[2]], dtype=float)
+        ef = np.array([e[0] - f[0], e[1] - f[1], e[2] - f[2]], dtype=float)
 
-    # Construct the same vectors used in the original function
-    ab = np.array([a[1] - b[1], a[2] - b[2], a[3] - b[3]], dtype=float)
-    bc = np.array([b[1] - c[1], b[2] - c[2], b[3] - c[3]], dtype=float)
-    de = np.array([d[1] - e[1], d[2] - e[2], d[3] - e[3]], dtype=float)
-    ef = np.array([e[1] - f[1], e[2] - f[2], e[3] - f[3]], dtype=float)
+        # Compute normal vectors exactly as in the original function
+        n1 = np.cross(ab, bc)
+        n2 = np.cross(de, ef)
 
-    # Compute normal vectors exactly as in the original function
-    n1 = np.cross(ab, bc)
-    n2 = np.cross(de, ef)
+        # Guard against collinear atoms giving zero normal vectors
+        n1_norm = np.linalg.norm(n1)
+        n2_norm = np.linalg.norm(n2)
+        if n1_norm == 0 or n2_norm == 0:
+            logger.error('Unable to compute plane angle for %s because one plane is degenerate.', file.name)
+        else:
+            # Compute the raw plane angle
+            cos_theta = np.dot(n1, n2) / (n1_norm * n2_norm)
 
-    # Guard against collinear atoms giving zero normal vectors
-    n1_norm = np.linalg.norm(n1)
-    n2_norm = np.linalg.norm(n2)
-    if n1_norm == 0 or n2_norm == 0:
-        logger.error('Unable to compute plane angle for %s because one plane is degenerate.', file.name)
+            # Clamp for numerical stability (removes issues with floating point arithmetic)
+            cos_theta = np.clip(cos_theta, -1.0, 1.0)
 
-    # Compute the raw plane angle
-    cos_theta = np.dot(n1, n2) / (n1_norm * n2_norm)
+            # Round to 3 decimal points
+            raw_angle = round(float(np.degrees(np.arccos(cos_theta))), 3)
 
-    # Clamp for numerical stability (removes issues with floating point arithmetic)
-    cos_theta = np.clip(cos_theta, -1.0, 1.0)
+            # Force selection of smallest angle regardless of sign
+            plane_angle = min(abs(raw_angle), abs(180 - raw_angle))
 
-    # Round to 3 decimal points
-    raw_angle = round(float(np.degrees(np.arccos(cos_theta))), 3)
+            results[f'plane_angle_{"-".join(plane_a_names)}_{"-".join(plane_b_names)} (º)'] = plane_angle
 
-    # Force selection of smallest angle regardless of sign
-    plane_angle = min(abs(raw_angle), abs(180 - raw_angle))
+    except Exception as e:
+        logger.error('Could not compute plane angle for %s because %s', file.name, e)
 
-    results = {f'plane_angle_{"-".join(plane_a_names)}_{"-".join(plane_b_names)} (º)': plane_angle}
-
-    #except Exception as e:
-    #    logger.error('Could not compute plane angle for %s because %s', file.name, e)
-
-    return pd.DataFrame(pd.Series(results))
+    return pd.DataFrame(pd.Series(results)).transpose()
 
 
 def get_plane_angle(dataframe: pd.DataFrame,
@@ -2052,6 +2059,7 @@ def get_plane_angle(dataframe: pd.DataFrame,
     # Get the rows of the dataframe that we will use as input for parallelization
     calculation_rows = [x[1] for x in calculation_df.iterrows()]
 
+    # Get the list of DataFrames
     with multiprocessing.Pool(processes=procs) as p:
         results = p.starmap(_get_plane_angle,
                             zip(calculation_rows,
@@ -2059,8 +2067,8 @@ def get_plane_angle(dataframe: pd.DataFrame,
                                 itertools.repeat(plane_atom_names[1])))
 
     results = pd.concat(results)
-
     results.set_index(FILE_COLUMN_NAME, inplace=True, drop=True)
+
     dataframe.set_index(FILE_COLUMN_NAME, inplace=True, drop=True)
 
     dataframe = pd.concat([dataframe, results], axis=1)

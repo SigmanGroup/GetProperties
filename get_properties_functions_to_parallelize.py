@@ -5,10 +5,6 @@ import math
 import itertools
 import multiprocessing
 
-
-
-
-
 import dbstep.Dbstep as db
 
 

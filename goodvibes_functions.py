@@ -110,7 +110,6 @@ def _get_goodvibes_thermo_data(logfile: Path | str,
             mm_freq_scale_factor=False,
             inertia='global',
             g4=False,
-            glowfreq=''
         )
 
         # Return the same values the old version
