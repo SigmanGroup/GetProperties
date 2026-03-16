@@ -4,35 +4,66 @@
 '''
 Utility functions for getting properties
 '''
+
 import sys
 import logging
 import subprocess
 import multiprocessing
 from pathlib import Path
-from io import StringIO
 
 from rdkit import Chem
-from rdkit.Chem import AllChem, rdDetermineBonds
+from rdkit.Chem import rdDetermineBonds
 from rdkit.Chem.Draw import rdMolDraw2D
-from rdkit.Chem.rdchem import Mol
 
 import py3Dmol
 
 logger = logging.getLogger(__name__)
 
+# This is the global name of the column that defines the Path/name of the files to process.
 FILE_COLUMN_NAME = 'file'
 
+
 def log_to_sdf(log: Path):
+    '''
+    Convert a Gaussian 16 logfile to one or more SDF files using Open Babel.
+    This file should have the same name as the Gaussian 16 logfile with the
+    .sdf extension
+
+    Parameters
+    ----------
+    log: Path
+        Path to the Gaussian logfile to convert.
+
+    Returns
+    -------
+    None
+    '''
     subprocess.run(args=['obabel', '-ilog', f'{log.absolute()}', '-osdf', '-m'], cwd=log.parent, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
+
 def log_to_mol_file(log: Path):
+    '''
+    Convert a Gaussian 16 logfile to one or more Mol files using Open Babel.
+    This file should have the same name as the Gaussian 16 logfile with the
+    `.mol` extension
+
+    Parameters
+    ----------
+    log: Path
+        Path to the Gaussian logfile to convert.
+
+    Returns
+    -------
+    None
+    '''
     subprocess.run(args=['obabel', '-ilog', f'{log.absolute()}', '-omol', '-m'], cwd=log.parent, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
 
 def _get_atom_map(file: Path,
                   substructure: Chem.Mol) -> list | tuple[Path, None]:
     '''
-    Gets an atom mapping from a .sdf file based on
-    another substructure
+    Gets an atom map from either a `.mol` or `.sdf` file based on
+    a substructure as an RDKit Mol object.
 
     Parameters
     ----------
@@ -86,127 +117,34 @@ def _get_atom_map(file: Path,
     return mapping
 
 
-def get_filecont(log: str | Path,
-                 split: bool = True) -> list[str] | str:
-
-    # default unless "normal termination" is in file
-    error = ''
-
-    # Correct
-    if isinstance(log, str):
-        if '.log' not in log:
-            log = log + '.log'
-        log = Path(log)
-
-    if not log.exists():
-        raise FileNotFoundError(f'{log.absolute()} does not exist.')
-
-    # Read in the text
-    with open(log, 'r', encoding='utf-8') as infile:
-        text = infile.read()
-
-    # Check for simple termination errors
-    if 'Error termination' in text:
-        error = f'****Failed or incomplete jobs for {log.name}'
-    if 'Normal termination' not in text:
-        error = f'****Failed or incomplete jobs for {log.name}'
-
-    # The caller requests to split the lines
-    if split:
-        with open(log, 'r', encoding='utf-8') as infile:
-            return infile.readlines(), error
-
-    return text, error
-
-def get_outstreams(log: Path | str): #gets the compressed stream information at the end of a Gaussian job
-    streams = []
-    starts,ends = [],[]
-    error = ""
-    an_error = True
-
-    if isinstance(log, Path):
-        pass
-    elif isinstance(log, str):
-        if '.log' in log:
-            pass
-        else:
-            log = log + '.log'
-        log = Path(log)
-
-    if not log.exists():
-        raise FileNotFoundError(f'{log.absolute()} does not exist.')
-
-    with open(log, 'r') as infile:
-        loglines = infile.readlines()
-
-    for line in loglines[::-1]:
-        if "Normal termination" in line:
-            an_error = False
-        if an_error:
-            error = "****Failed or incomplete jobs for " + log + ".log"
-
-    for i in range(len(loglines)):
-        if "1\\1\\" in loglines[i]:
-            starts.append(i)
-        if "@" in loglines[i]:
-            ends.append(i)
-    #    if "Normal termination" in loglines[i]:
-    #        error = ""
-
-    if len(starts) != len(ends) or len(starts) == 0: #probably redundant
-        error = f'****Failed or incomplete jobs for {log.name}'
-        return streams, error
-
-    for i in range(len(starts)):
-        tmp = ""
-        for j in range(starts[i],ends[i]+1,1):
-            tmp = tmp + loglines[j][1:-1]
-        streams.append(tmp.split("\\"))
-
-    return streams, error
-
-
-def get_geom(streams):
-    # Extracts the geometry from the compressed stream
-    geom = []
-    for item in streams[-1][16:]:
-        if item == "":
-            break
-        geom.append([item.split(',')[0], float(item.split(',')[-3]), float(item.split(',')[-2]), float(item.split(',')[-1])])
-    return geom
-
-
-def get_specdata(atoms, prop) -> list:
-    '''
-    input a list of atom numbers of interest and a
-    list of pairs of all atom numbers and property
-    of interest for use with NMR, NBO, possibly
-    others with similar output structures
-    '''
-    propout = []
-    for atom in atoms:
-        if atom.isdigit():
-            a = int(atom) - 1
-            if a <= len(prop):
-                propout.append(float(prop[a][1]))
-            else:
-                continue
-        else:
-            continue
-    return propout
-
-
 def mol_to_image(mol,
                  show_atom_indices: bool = True,
                  image_size: tuple[int, int] = (400, 400)) -> str:
     '''
-    Draws an RDKit mol and returns a SVG image.
+    Draw an RDKit molecule and return the SVG image text.
+
+    Parameters
+    ----------
+    mol: Chem.Mol
+        RDKit molecule to draw.
+
+    show_atom_indices: bool
+        If True, annotate each atom with its atom number (1-indexed) before drawing.
+
+    image_size: tuple[int, int]
+        Width and height of the SVG image in pixels.
+
+    Returns
+    -------
+    svg: str
+        SVG text representing the rendered molecule image.
     '''
 
     if show_atom_indices:
         for atom in mol.GetAtoms():
-            # For each atom, set the property "atomNote" to a index+1 of the atom
-            atom.SetProp("atomNote", str(atom.GetIdx()))
+
+            # For each atom, set the property "atomNote" to a index + 1 of the atom
+            atom.SetProp("atomNote", str(atom.GetIdx() + 1))
     d2d = rdMolDraw2D.MolDraw2DSVG(image_size[0], image_size[1])
     dopts = d2d.drawOptions()
     dopts.bondLineWidth = 5
@@ -216,20 +154,20 @@ def mol_to_image(mol,
     return d2d.GetDrawingText()
 
 
-def _read_in_mol_sdf_with_xyz_correction(file: Path) -> tuple[Path | None]:
+def _read_in_mol_sdf_with_xyz_correction(file: Path) -> tuple[Path | None] | tuple[Path | Chem.Mol]:
     '''
-    Reads an RDKit Mol object from an .sdf or .mol file, falling back to an .xyz
-    conversion with OpenBabel and reconstructing connectivity and bond orders
-    when the initial read fails.
+    Reads an RDKit Mol object from an `.sdf` or `.mol` file, falling back to a
+    `.xyz` conversion with OpenBabel and reconstructing connectivity and bond
+    orders when the initial read fails.
 
     Parameters
     ----------
     file: Path
-        Path to the input structure file. Supported extensions are .sdf and .mol.
+        Path to the input structure file. Supported extensions are `.sdf` and `.mol`.
 
     Returns
     -------
-    file_and_mol: tuple
+    (file, mol): tuple[Path, Chem.Mol] | tuple[Path, None]
         Tuple of (file, mol), where file is the original Path and mol is the
         RDKit Mol object if successfully read, or None if reading and correction
         both fail.
@@ -311,10 +249,13 @@ def convert_files_in_directory(directory: Path) -> list[Path]:
     return failed_files
 
 
-def draw_3D_mol(mol: Mol,
+def draw_3D_mol(mol: Chem.Mol,
                 viewport_size: tuple[int, int] = (400, 300)) -> None:
     '''
     Draw an interactive 3D molecule in a Jupyter notebook with 1-indexed atom labels.
+    This function uses py3Dmol which is a wrapper of the javascript 3D mol.
+
+    This function might cause problems if py3Dmol becomes unsupported.
 
     Parameters
     ----------
@@ -326,8 +267,7 @@ def draw_3D_mol(mol: Mol,
 
     Returns
     -------
-    None: None
-        Displays the viewer in the notebook.
+    None
     '''
 
     # Create the 3D viewer
@@ -371,13 +311,13 @@ def split_compound_name(file: str | Path,
     Parameters
     ----------
     file: str | Path
-        Path to the file or just the filename
+        Path to the file or just the filename.
 
     delimiter: str
-        Character on which we will split the name
+        Character on which we will split the name.
 
     return_key: int
-        The key of the list of the string split that is returned
+        The key of the item in the list that is returned.
     '''
     stem = Path(file).stem
     return str(stem.split(delimiter)[return_key])
@@ -395,7 +335,6 @@ def configure_logger(debug: bool = False) -> None:
     Returns
     -------
     None
-        Configures the root logger for the current process.
     '''
 
     # Configure logging for this process
@@ -407,10 +346,114 @@ def configure_logger(debug: bool = False) -> None:
         force=True
     )
 
-if __name__ == "__main__":
+#TODO These functions need to be rewritten and updated
 
-    # Testing the bond order assignment from rdkit
-    file = Path('./data/11171210_2.mol')
+def get_filecont(log: str | Path,
+                 split: bool = True) -> list[str] | str:
 
-    mol = Chem.MolFromMolFile(str(file.absolute()))
+    # default unless "normal termination" is in file
+    error = ''
 
+    # Correct
+    if isinstance(log, str):
+        if '.log' not in log:
+            log = log + '.log'
+        log = Path(log)
+
+    if not log.exists():
+        raise FileNotFoundError(f'{log.absolute()} does not exist.')
+
+    # Read in the text
+    with open(log, 'r', encoding='utf-8') as infile:
+        text = infile.read()
+
+    # Check for simple termination errors
+    if 'Error termination' in text:
+        error = f'****Failed or incomplete jobs for {log.name}'
+    if 'Normal termination' not in text:
+        error = f'****Failed or incomplete jobs for {log.name}'
+
+    # The caller requests to split the lines
+    if split:
+        with open(log, 'r', encoding='utf-8') as infile:
+            return infile.readlines(), error
+
+    return text, error
+
+
+def get_outstreams(log: Path | str): #gets the compressed stream information at the end of a Gaussian job
+    streams = []
+    starts,ends = [],[]
+    error = ""
+    an_error = True
+
+    if isinstance(log, Path):
+        pass
+    elif isinstance(log, str):
+        if '.log' in log:
+            pass
+        else:
+            log = log + '.log'
+        log = Path(log)
+
+    if not log.exists():
+        raise FileNotFoundError(f'{log.absolute()} does not exist.')
+
+    with open(log, 'r') as infile:
+        loglines = infile.readlines()
+
+    for line in loglines[::-1]:
+        if "Normal termination" in line:
+            an_error = False
+        if an_error:
+            error = "****Failed or incomplete jobs for " + log + ".log"
+
+    for i in range(len(loglines)):
+        if "1\\1\\" in loglines[i]:
+            starts.append(i)
+        if "@" in loglines[i]:
+            ends.append(i)
+    #    if "Normal termination" in loglines[i]:
+    #        error = ""
+
+    if len(starts) != len(ends) or len(starts) == 0: #probably redundant
+        error = f'****Failed or incomplete jobs for {log.name}'
+        return streams, error
+
+    for i in range(len(starts)):
+        tmp = ""
+        for j in range(starts[i],ends[i]+1,1):
+            tmp = tmp + loglines[j][1:-1]
+        streams.append(tmp.split("\\"))
+
+    return streams, error
+
+
+def get_geom(streams):
+    # Extracts the geometry from the compressed stream
+    geom = []
+    for item in streams[-1][16:]:
+        if item == "":
+            break
+        geom.append([item.split(',')[0], float(item.split(',')[-3]), float(item.split(',')[-2]), float(item.split(',')[-1])])
+    return geom
+
+
+def get_specdata(atoms, prop) -> list:
+    '''
+    input a list of atom numbers of interest and a
+    list of pairs of all atom numbers and property
+    of interest for use with NMR, NBO, possibly
+    others with similar output structures
+    '''
+    propout = []
+    for atom in atoms:
+        if atom.isdigit():
+            a = int(atom) - 1
+            if a <= len(prop):
+                propout.append(float(prop[a][1]))
+            else:
+                continue
+        else:
+            continue
+    return propout

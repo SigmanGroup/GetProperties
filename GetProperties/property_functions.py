@@ -836,6 +836,12 @@ def get_distance(dataframe: pd.DataFrame,
         the resultant descriptors
     '''
 
+    # Validate the input
+    if not all(isinstance(x, list) for x in dist_list):
+        raise ValueError(f'Distances must be specified as a list of 2-membered list of atom names.')
+    if not all(len(x) == 2 for x in dist_list):
+        raise ValueError(f'Distances must be specified as a list of 2-membered list of atom names.')
+
     interesting_columns = [FILE_COLUMN_NAME]
     interesting_columns.extend(list(set([x for xs in dist_list for x in xs])))
     calculation_df = dataframe[interesting_columns].copy(deep=True)

@@ -4,11 +4,11 @@ This repository contains an updated version of the Sigman group's "Get_Propertie
 
 ## Installation
 
-1. Create a conda environment using the  gpenv_312.yml file. <br>
+1. Create a conda environment using the  gpenv_312.yml file.
 
     `conda env create -f gpenv_312.yml`
 
-2. Activate the environment and use the notebook. <br>
+2. Activate the environment and use the notebook.
 
     `conda activate gp_env`
 
@@ -45,9 +45,10 @@ Work in progress.
 
 ## To-do
 
-1. Implement get_IR function
-2. Include static copy of old version of GoodVibes (or just update it)
-3. Rename get_nmr function
+1. Implement get_IR
+2. Implement get_sterimol_dbstep
+3. Implement get_sterimol2vec
+4. Implement get_enthalpies
 
 ## Major changes
 
@@ -58,6 +59,8 @@ molecule while regular sterimol is calculated if `radius` is `None`
 - Logfiles are automatically converted if a .mol file
 - Logfiles can be in any directory instead of the same directory as the Jupyter notebook
 - Substructure atom mapping now includes 3D structure viewing
+- File reading failures are decreased using a `.xyz` correction process
+- Failure to read in files notifies user
 
 ## Contributors
 
