@@ -60,10 +60,12 @@ def log_to_mol_file(log: Path):
 
 
 def _get_atom_map(file: Path,
-                  substructure: Chem.Mol) -> list | tuple[Path, None]:
+                  substructure: Chem.Mol) -> list:
     '''
     Gets an atom map from either a `.mol` or `.sdf` file based on
-    a substructure as an RDKit Mol object.
+    a substructure as an RDKit Mol object. The first element of the
+    returned list is the file Path object, and the remaining elements
+    are the 1-index atom numbers that matched the provided substructure.
 
     Parameters
     ----------
@@ -100,19 +102,19 @@ def _get_atom_map(file: Path,
         return file, None
 
     # Get the substructure match
-    match = mol.GetSubstructMatches(substructure)
+    matches = mol.GetSubstructMatches(substructure)
 
-    # Check that there is only one substructure
-    if len(match) == 0:
-        logger.error('No matching pattern for %s', file.name)
-        return file, None
-    elif len(match) > 1:
-        logger.error('More than one matching pattern for %s\t%s', file.name, match)
-        return file, None
+    #logger.debug('Found %d matches for %s.\t%s', len(matches), file.name, matches)
+
+    if len(matches) == 0:
+        logger.warning('Found %d matching patterns for %s\t%s', len(matches), file.name, matches)
+    elif len(matches) > 1:
+        logger.warning('Found %d matching patterns for %s\t%s', len(matches), file.name, matches)
 
     # Append the atom number (1-indexed values) of the substructure match
-    for idx in match[0]:
-        mapping.append(idx + 1)
+    for _match in matches:
+        for idx in _match:
+            mapping.append(int(idx + 1))
 
     return mapping
 
@@ -302,11 +304,26 @@ def draw_3D_mol(mol: Chem.Mol,
 
 def split_compound_name(file: str | Path,
                         delimiter: str,
-                        return_key: int = 0) -> str:
+                        return_key: int | list[int] = 0) -> str:
     '''
     Helper function that splits a file stem into separate parts based
     on a delimiter and returns the portion of the split string based on
     the return key.
+
+    Examples:
+    separator = '_', return_key = 0
+    molecule14_5 -> 'molecule14'
+
+    separator = '_', return_key = 1
+    molecule14_5 -> '5'
+
+    Note that specifying a list of keys will return a string that is
+    joined by the delimiter. This is useful if you include the delimiter
+    (e.g., "_") in the compound name.
+
+    separator = '_', return_key = [0, 1]
+    prod_3a_1 -> 'prod_3a'
+
 
     Parameters
     ----------
@@ -316,11 +333,21 @@ def split_compound_name(file: str | Path,
     delimiter: str
         Character on which we will split the name.
 
-    return_key: int
-        The key of the item in the list that is returned.
+    return_key: int | list[int]
+        The key or list of keys to return.
+
+    Returns
+    -------
+    result: str
+        The selected split component if return_key is an int, or a list
+        of selected components if return_key is a list of ints.
     '''
     stem = Path(file).stem
-    return str(stem.split(delimiter)[return_key])
+
+    if isinstance(return_key, int):
+        return stem.split(delimiter)[return_key]
+
+    return f'{delimiter}'.join([stem.split(delimiter)[i] for i in return_key])
 
 
 def configure_logger(debug: bool = False) -> None:

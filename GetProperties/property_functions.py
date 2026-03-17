@@ -23,6 +23,8 @@ from morfeus import BuriedVolume
 from morfeus import Pyramidalization
 from morfeus import SASA
 
+import dbstep.Dbstep as db
+
 from .utils import get_filecont, get_outstreams, get_geom
 from .utils import get_specdata
 from .utils import FILE_COLUMN_NAME
@@ -1063,8 +1065,8 @@ def _get_dihedral(row: pd.Series, dihedral_list: list[list]) -> pd.Series:
                     bc = np.array([b[1]-c[1],b[2]-c[2],b[3]-c[3]])
                     cd = np.array([c[1]-d[1],c[2]-d[2],c[3]-d[3]])
 
-                    n1 = np.cross(ab,bc) # normal vectors
-                    n2 = np.cross(bc,cd)
+                    n1 = np.cross(ab, bc) # normal vectors
+                    n2 = np.cross(bc, cd)
 
                     dihedral_value = round(np.degrees(np.arccos(np.dot(n1,n2) / (np.linalg.norm(n1)*np.linalg.norm(n2)))),3)
                     results[f'dihedral_{dihedral[0]}_{dihedral[1]}_{dihedral[2]}_{dihedral[3]} (°)'] = dihedral_value
@@ -1169,7 +1171,7 @@ def _get_vbur(row: pd.Series,
     results = {}
     for atom in a_list:
         for radius in radii:
-            results[f'%Vbur_{atom}_{str(radius)}Å'] = None
+            results[f'%Vbur_{atom}_{radius:.1f}Å'] = None
 
     file = Path(row[FILE_COLUMN_NAME])
 
@@ -1199,7 +1201,7 @@ def _get_vbur(row: pd.Series,
                         vbur = BuriedVolume(elements, coordinates, int(row[atom]), include_hs=True, radius=radius)
 
                         vbur_value = vbur.percent_buried_volume * 100
-                        results[f'%Vbur_{atom}_{str(radius)}Å'] = vbur_value
+                        results[f'%Vbur_{atom}_{radius:.1f}Å'] = vbur_value
 
     except Exception as e:
         logger.error('Unable to acquire vbur values for %s because %s', file.name, e)
@@ -1713,7 +1715,7 @@ def _get_pyramidalization(row: pd.Series,
     # Get a results dictionary that contains all the keys of the atoms we're looking at
     results = {}
     for atom_label in [x for x in row.keys() if FILE_COLUMN_NAME not in x]:
-        results[f'pyramidalization_Gavrish_{atom_label}_(°)'] = None
+        results[f'pyramidalization_Gavrish_{atom_label}(°)'] = None
         results[f'pyramidalization_Agranat-Radhakrishnan_{atom_label}'] = None
 
     file = Path(row[FILE_COLUMN_NAME])
@@ -1737,7 +1739,7 @@ def _get_pyramidalization(row: pd.Series,
                 # Make Pyr object
                 pyr = Pyramidalization(coordinates, int(row[atom_label]))
 
-                results[f'pyramidalization_Gavrish_{atom_label}_(°)'] = pyr.P_angle
+                results[f'pyramidalization_Gavrish_{atom_label}(°)'] = pyr.P_angle
                 results[f'pyramidalization_Agranat-Radhakrishnan_{atom_label}'] = pyr.P
 
     except Exception as e:
@@ -1940,7 +1942,7 @@ def _get_plane_angle(row: pd.Series,
         streams, error = get_outstreams(log=file)
 
     # Set up the results dictionary
-    results = {f'plane_angle_{"-".join(plane_a_names)}_{"-".join(plane_b_names)} (º)': None}
+    results = {f'plane_angle_{"-".join(plane_a_names)}_{"-".join(plane_b_names)} (°)': None}
     results[FILE_COLUMN_NAME] = file.name
 
     try:
@@ -1989,7 +1991,7 @@ def _get_plane_angle(row: pd.Series,
             # Force selection of smallest angle regardless of sign
             plane_angle = min(abs(raw_angle), abs(180 - raw_angle))
 
-            results[f'plane_angle_{"-".join(plane_a_names)}_{"-".join(plane_b_names)} (º)'] = plane_angle
+            results[f'plane_angle_{"-".join(plane_a_names)}_{"-".join(plane_b_names)} (°)'] = plane_angle
 
     except Exception as e:
         logger.error('Could not compute plane angle for %s because %s', file.name, e)
@@ -2082,6 +2084,138 @@ def get_plane_angle(dataframe: pd.DataFrame,
 
     logger.info('Plane angle funciton has completed.')
     return dataframe
+
+
+
+def _get_sterimol_dbstep(row: pd.Series,
+                         sterimol_list: list[list[str]]) -> pd.Series:
+    '''
+    Uses DBStep to calculate sterimol for every pair of atoms in
+    sterimol list
+
+    Parameters
+    ----------
+    row: pd.Series
+        Series that contains <FILE_COLUMN_NAME> which is a path to the
+        file to be used for vbur calculation as well as the
+        atom labels
+
+    sterimol_list: list[list[str]]
+        List of list of strings where the strings are the atom labels
+        that make up the Sterimol axis of interest.
+
+    Returns
+    ----------
+    pd.DataFrame
+        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        the resultant descriptors
+    '''
+    configure_logger(debug=False)
+    assert FILE_COLUMN_NAME in row.keys()
+
+    # Make a results dictionary
+    results = {}
+    for atom_pair in sterimol_list:
+
+        # Validate input
+        if len(atom_pair) != 2:
+                raise ValueError(f'Number of atoms for Sterimol calculation must be 2 not {len(atom_pair)} ({atom_pair})')
+
+        results[f'Sterimol_L_{atom_pair[0]}_{atom_pair[1]}(Å)_dbstep'] = None
+        results[f'Sterimol_B1_{atom_pair[0]}_{atom_pair[1]}(Å)_dbstep'] = None
+        results[f'Sterimol_B5_{atom_pair[0]}_{atom_pair[1]}(Å)_dbstep'] = None
+
+    # Get the file we're looking at
+    file = Path(row[FILE_COLUMN_NAME])
+
+    try:
+
+        # Iterate through the atom pairs
+        for atom_pair in sterimol_list:
+
+            # DBStep uses 1-indexed atom numbers (what exists in the DataFrame)
+            atom_a = int(row[atom_pair[0]])
+            atom_b = int(row[atom_pair[1]])
+
+            # Create DBSTEP object
+            _sterimol_obj = db.dbstep(str(file.absolute()),
+                                    atom1=atom_a,
+                                    atom2=atom_b,
+                                    commandline=True,
+                                    verbose=False,
+                                    quiet=True,
+                                    sterimol=True,
+                                    measure='grid')
+
+            # Save to results dict
+            results[f'Sterimol_L_{atom_pair[0]}_{atom_pair[1]}(Å)_dbstep'] = _sterimol_obj.L
+            results[f'Sterimol_B1_{atom_pair[0]}_{atom_pair[1]}(Å)_dbstep'] = _sterimol_obj.Bmin
+            results[f'Sterimol_B5_{atom_pair[0]}_{atom_pair[1]}(Å)_dbstep'] = _sterimol_obj.Bmax
+
+    except Exception as e:
+        logger.error('Unable to acquire vbur values for: %s because %s', file.name, e)
+
+    results[FILE_COLUMN_NAME] = file.name
+    return pd.DataFrame(pd.Series(results)).transpose()
+
+
+def get_sterimol_dbstep(dataframe: pd.DataFrame,
+                         data_dir: Path,
+                         sterimol_list: list[list[str]],
+                         procs: int = 1):
+    '''
+    Uses MORFEUS to get sterimol values
+
+    Parameters
+    ----------
+    dataframe: pd.DataFrame
+        DataFrame containing <FILE_COLUMN_NAME> column
+
+    data_dir: Path
+        Directory where the files are located
+
+    sterimol_list: list[list[str]]
+        List of list of strings where the strings are the atom labels
+        that make up the Sterimol axis of interest.
+
+    procs: int
+        Number of processors
+
+    Returns
+    ----------
+    pd.DataFrame
+        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        the resultant descriptors
+    '''
+    interesting_columns = [FILE_COLUMN_NAME]
+    interesting_columns.extend(list(set([x for xs in sterimol_list for x in xs])))
+    calculation_df = dataframe[interesting_columns].copy(deep=True)
+
+    # Convert the <FILE_COLUMN_NAME> column to path
+    calculation_df[FILE_COLUMN_NAME] = [str(Path(data_dir / x).absolute()) for x in calculation_df[FILE_COLUMN_NAME].to_list()]
+
+    # Flatten the list of inputs to assess the label presence in the dataframe
+    possible_columns = [x for xs in sterimol_list for x in xs]
+    if not all([x in calculation_df.columns for x in possible_columns]):
+        raise KeyError(f'Not all of the requested columns are in the DataFrame. Requested: {possible_columns} Found: {list(dataframe.columns)}')
+
+    # Get the rows of the dataframe that we will use as input for parallelization
+    calculation_rows = [x[1] for x in calculation_df.iterrows()]
+
+    with multiprocessing.Pool(processes=procs) as p:
+        results = p.starmap(_get_sterimol_dbstep, zip(calculation_rows, itertools.repeat(sterimol_list)))
+
+    results = pd.concat(results)
+
+    results.set_index(FILE_COLUMN_NAME, inplace=True, drop=True)
+    dataframe.set_index(FILE_COLUMN_NAME, inplace=True, drop=True)
+
+    dataframe = pd.concat([dataframe, results], axis=1)
+    dataframe.reset_index(inplace=True)
+
+    logger.info('Sterimol (DBStep) function has completed for %s.', sterimol_list)
+    return dataframe
+
 
 if __name__ == "__main__":
 

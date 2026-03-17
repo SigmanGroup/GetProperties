@@ -22,69 +22,6 @@ volume_pattern = re.compile("Molar volume =")
 frqs_pattern = re.compile("Red. masses")
 frqsend_pattern = re.compile("Thermochemistry")
 
-
-def get_sterimol_dbstep(dataframe, sterimol_list): #uses DBSTEP to calculate sterimol L, B1, B5 for two input atoms for every entry in df
-    sterimol_dataframe = pd.DataFrame(columns=[])
-
-    for index, row in dataframe.iterrows():
-        try:
-            log_file = row['log_name']
-
-            #parsing the Sterimol axis defined in the list from input line
-            sterimolnums_list = []
-            for sterimol in sterimol_list:
-                atomnum_list = [] #the atom numbers use to collect sterimol values (i.e. [18 16 17 15]) are collected from the df using the input list (i.e. [["O2", "C1"], ["O3", "H5"]])
-                for atom in sterimol:
-                    atomnum = row[str(atom)]
-                    atomnum_list.append(str(atomnum))
-                sterimolnums_list.append(atomnum_list) #append atomnum_list for each sterimol axis defined in the input to make a list of the form [['18', '16'], ['16', '15']]
-
-            #checks for if the wrong number of atoms are input or input is not of the correct form
-            error = ""
-            for sterimol in sterimolnums_list:
-                if len(sterimol)%2 != 0:
-                    error = "****Number of atom inputs given for Sterimol is not divisible by two. " + str(len(sterimol)) + " atoms were given. "
-                for atom in sterimol:
-                    if not atom.isdigit():
-                        error += "**** " + atom + ": Only numbers accepted as input for Sterimol"
-                if error != "": print(error)
-
-            #this collects Sterimol values for each pair of inputs
-            sterimol_out = []
-            fp = log_file + str(".log")
-            for sterimol in sterimolnums_list:
-                sterimol_values = db.dbstep(fp,atom1=int(sterimol[0]),atom2=int(sterimol[1]),commandline=True,verbose=False,sterimol=True,measure='grid')
-                sterimol_out.append(sterimol_values)
-
-            #this makes column headers based on Sterimol axis defined in the input line
-            sterimoltitle_list = []
-            for sterimol in sterimol_list:
-                sterimoltitle = str(sterimol[0]) + "_" + str(sterimol[1])
-                sterimoltitle_list.append(sterimoltitle)
-
-            #this adds the data from sterimolout into the new property df
-            row_i = {}
-            for a in range(0, len(sterimolnums_list)):
-                entry = {'Sterimol_B1_' + str(sterimoltitle_list[a]) + "(Å)_dbstep": sterimol_out[a].Bmin,
-                         'Sterimol_B5_' + str(sterimoltitle_list[a]) + "(Å)_dbstep": sterimol_out[a].Bmax,
-                         'Sterimol_L_' + str(sterimoltitle_list[a]) + "(Å)_dbstep": sterimol_out[a].L}
-                row_i.update(entry)
-            sterimol_dataframe = sterimol_dataframe.append(row_i, ignore_index=True)
-        except:
-            print('****Unable to acquire DSBTEP Sterimol parameters for:', row['log_name'], ".log")
-            row_i = {}
-            try:
-                for a in range(0, len(sterimolnums_list)):
-                    entry = {'Sterimol_L_' + str(sterimoltitle_list[a]) + '(Å)_dbstep': "no data",
-                    'Sterimol_B1_' + str(sterimoltitle_list[a]) + '(Å)_dbstep': "no data",
-                    'Sterimol_B5_' + str(sterimoltitle_list[a]) + '(Å)_dbstep': "no data"}
-                    row_i.update(entry)
-                sterimol_dataframe = sterimol_dataframe.append(row_i, ignore_index=True)
-            except:
-                print("****Ope, there's a problem with your atom inputs.")
-    print("DBSTEP Sterimol function has completed for", sterimol_list)
-    return(pd.concat([dataframe, sterimol_dataframe], axis = 1))
-
 def get_sterimol2vec(dataframe, sterimol_list, end_r, step_size): #uses DBSTEP to calculate sterimol Bmin and Bmax for two input atoms at intervals from 0 to end_r at step_size
     sterimol_dataframe = pd.DataFrame(columns=[])
     num_steps = int((end_r)/step_size + 1)
