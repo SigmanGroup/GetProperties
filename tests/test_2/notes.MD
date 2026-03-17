@@ -11,7 +11,7 @@ substructure = Chem.MolFromSmarts('[*][#7](c1[c]([H])[c]([H])[c]([H])[c]([H])[c]
 These were the assignments from the mapped atoms. Some of the mapped atoms are duplicated because of a few files that
 had multiple matches (prod_3a, prod_5a, prod_5i). All conformers of prod_5l failed because there was no substructure.
 
-'''python
+'''
 atom_labels = {'log_name': 'log_name',
                 0: 'HC',
                 1: 'N',
@@ -74,7 +74,7 @@ The difference between the old and new properties were computed. For one file, t
 different by around 25%. After inspecting the file, the new extracted ZPE of 0.22768 Hartree/particle is correct. It is
 likely that the old version has a bug when extracting this value from the compressed stream.
 
-'''python
+'''
 prod_3i_1.log   ZPE(Hartree)    new: 0.22768    old: 0.45536    diff: -0.2277 (50.0 %)
 prod_3i_1.log   T*S         new: 0.05013        old: 0.06546    diff: -0.0153 (23.42 %)
 prod_3i_1.log   T*qh_S      new: 0.04867        old: 0.06254    diff: -0.0139 (22.18 %)
@@ -82,5 +82,6 @@ dihedral_Cb_N_Ca_Ca1 (°) vs dihedral_Cb_N_Ca_Ca1(°)     Total absolute differe
 dihedral_Cb_N_Ca_Ca2 (°) vs dihedral_Cb_N_Ca_Ca2(°)     Total absolute difference: 0.00 ax abs: 0.00
 dihedral_Ca_N_Cb_Cb1 (°) vs dihedral_Ca_N_Cb_Cb1(°)     Total absolute difference: 0.00 ax abs: 0.00
 dihedral_Ca_N_Cb_Cb2 (°) vs dihedral_Ca_N_Cb_Cb2(°)     Total absolute difference: 0.00 ax abs: 0.00
-plane_angle_Ca-Ca1-Ca2_Cb-Cb1-Cb2 (°) vs planeangle_Ca_Ca1_Ca2_&_Cb_Cb1_Cb2(°)  Total absolute difference: 0.00 ax abs: 0.00
+plane_angle_Ca-Ca1-Ca2_Cb-Cb1-Cb2 (°) vs planeangle_Ca_Ca1_Ca2_&_Cb_Cb1_Cb2(°)
+Total absolute difference: 0.00 ax abs: 0.00
 '''
