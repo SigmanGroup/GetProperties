@@ -1,6 +1,7 @@
 # GetProperties
 
-This repository contains an updated version of the Sigman group's "Get_Properties" script with parallelization.
+This repository contains an updated version of the Sigman group's "Get_Properties" script with parallelization. For the
+original script, please visit the [original repository](https://github.com/SigmanGroup/Get_Properties).
 
 ## Installation
 
@@ -14,7 +15,9 @@ This repository contains an updated version of the Sigman group's "Get_Propertie
 
 ## Usage
 
-Work in progress.
+Use the notebook `get_properties.ipynb` to collect your properties. Be sure to set your Jupyter kernel to `gpenv_3121.
+Follow the instructions for each cell. Several comparisons between the old and new versions are available in the
+`/tests/` directory.
 
 ## Parallelized Functions
 
@@ -49,16 +52,17 @@ Work in progress.
 2. Implement get_sterimol_dbstep
 3. Implement get_sterimol2vec
 4. Implement get_enthalpies
+5. Complete
 
 ## Major changes
 
 - Everything is parallelized
 - Using logging module instead of print statements (easily redirected to file)
+- Interactive 3D visualization of your files for easy atom name assignment
 - `get_buried_sterimol` has been combined into `get_sterimol_morfeus`. Specifying a radius will automatically bury the
 molecule while regular sterimol is calculated if `radius` is `None`
-- Logfiles are automatically converted if a .mol file
+- Logfiles are automatically converted to .mol files
 - Logfiles can be in any directory instead of the same directory as the Jupyter notebook
-- Substructure atom mapping now includes 3D structure viewing
 - File reading failures are decreased using a `.xyz` correction process
 - Failure to read in files notifies user
 
