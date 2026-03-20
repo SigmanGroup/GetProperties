@@ -11,12 +11,12 @@ original script, please visit the [original repository](https://github.com/Sigma
 
 2. Activate the environment and use the notebook.
 
-    `conda activate gp_env`
+    `conda activate gpenv_312`
 
 ## Usage
 
 Use the notebook `get_properties.ipynb` to collect your properties. Be sure to set your Jupyter kernel to `gpenv_312`.
-Follow the instructions for each cell. Several comparisons between the old and new versions are available in the
+Follow the instructions for each cell. Several comparisons between the old and new versions can be found in the
 `/tests/` directory.
 
 ## Parallelized Functions
@@ -52,7 +52,7 @@ Follow the instructions for each cell. Several comparisons between the old and n
 2. Implement get_sterimol_dbstep
 3. Implement get_sterimol2vec
 4. Implement get_enthalpies
-5. Switch to computing properties for one file to reduce I/O operations by ~90% (major overhaul)
+5. Switch to computing properties for one file at a time to reduce I/O operations by ~90% (major overhaul)
 
 ## Major changes
 
