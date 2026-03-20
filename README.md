@@ -15,7 +15,7 @@ original script, please visit the [original repository](https://github.com/Sigma
 
 ## Usage
 
-Use the notebook `get_properties.ipynb` to collect your properties. Be sure to set your Jupyter kernel to `gpenv_3121.
+Use the notebook `get_properties.ipynb` to collect your properties. Be sure to set your Jupyter kernel to `gpenv_312`.
 Follow the instructions for each cell. Several comparisons between the old and new versions are available in the
 `/tests/` directory.
 
