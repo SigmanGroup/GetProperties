@@ -52,7 +52,7 @@ Follow the instructions for each cell. Several comparisons between the old and n
 2. Implement get_sterimol_dbstep
 3. Implement get_sterimol2vec
 4. Implement get_enthalpies
-5. Complete
+5. Switch to computing properties for one file to reduce I/O operations by ~90% (major overhaul)
 
 ## Major changes
 
