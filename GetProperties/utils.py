@@ -310,7 +310,8 @@ def split_compound_name(file: str | Path,
     on a delimiter and returns the portion of the split string based on
     the return key.
 
-    Examples:
+    Examples
+    ----------
     separator = '_', return_key = 0
     molecule14_5 -> 'molecule14'
 
@@ -323,7 +324,6 @@ def split_compound_name(file: str | Path,
 
     separator = '_', return_key = [0, 1]
     prod_3a_1 -> 'prod_3a'
-
 
     Parameters
     ----------
