@@ -342,7 +342,7 @@ def _get_volume(file: Path) -> pd.DataFrame:
         filecont, error = get_filecont(file, split=True) #read the contents of the log file
         if error != "":
             logger.error('Error in _get_volume: %s\t%s', file.name, error)
-            row_i = pd.Series({FILE_COLUMN_NAME: file.name, 'volume(Bohr_radius³/mol)': None})
+            row_i = pd.Series({FILE_COLUMN_NAME: file.name, 'volume(Bohr_radius^3 mol^-1)': None})
 
         else:
             volume = []
@@ -350,11 +350,11 @@ def _get_volume(file: Path) -> pd.DataFrame:
                 if volume_pattern.search(line):
                     volume.append(line.split()[3])
             #this adds the data into the new property df
-            row_i = pd.Series({FILE_COLUMN_NAME:file.name, 'volume(Bohr_radius³/mol)': float(volume[0])})
+            row_i = pd.Series({FILE_COLUMN_NAME:file.name, 'volume(Bohr_radius^3 mol^-1)': float(volume[0])})
 
     except Exception as e:
         logger.error('Unable to acquire volume for: %s because %s', file.name, e)
-        row_i = pd.Series({FILE_COLUMN_NAME: file.name, 'volume(Bohr_radius³/mol)': None})
+        row_i = pd.Series({FILE_COLUMN_NAME: file.name, 'volume(Bohr_radius^3 mol^-1)': None})
 
     return pd.DataFrame(row_i).transpose()
 
@@ -425,8 +425,8 @@ def _get_SASA(file: Path) -> pd.DataFrame:
             if error != "":
                 logger.error('Error in _get_sasa: %s\t%s', file.name, error)
                 row_i = pd.Series({FILE_COLUMN_NAME:file.name,
-                                'SASA_surface_area(Å²)': None,
-                                'SASA_volume(Å³)': None,
+                                'SASA_surface_area(Å^2)': None,
+                                'SASA_volume(Å^3)': None,
                                 'SASA_sphericity': None})
             else:
                 log_coordinates = get_geom(streams)
@@ -438,14 +438,14 @@ def _get_SASA(file: Path) -> pd.DataFrame:
             sphericity = np.cbrt((36*math.pi*sasa.volume**2))/sasa.area
 
             row_i = pd.Series({FILE_COLUMN_NAME:file.name,
-                               'SASA_surface_area(Å²)': sasa.area,
-                               'SASA_volume(Å³)': sasa.volume, #volume inside the solvent accessible surface area
+                               'SASA_surface_area(Å^2)': sasa.area,
+                               'SASA_volume(Å^3)': sasa.volume, #volume inside the solvent accessible surface area
                                'SASA_sphericity': sphericity})
     except Exception as e:
         logger.error('Unable to acquire SASA for: %s because %s', file.name, e)
         row_i = pd.Series({FILE_COLUMN_NAME:file.name,
-                            'SASA_surface_area(Å²)': None,
-                            'SASA_volume(Å³)': None,
+                            'SASA_surface_area(Å^2)': None,
+                            'SASA_volume(Å^3)': None,
                             'SASA_sphericity': None})
 
     return pd.DataFrame(row_i).transpose()
