@@ -173,19 +173,19 @@ def _get_polarizability(file: Path) -> pd.DataFrame:
         the resultant descriptors
     '''
     configure_logger(debug=False)
+    row_i = pd.Series({FILE_COLUMN_NAME:file.name, 'polar_iso(au)': None, 'polar_aniso(au)': None})
     try:
         # Don't split the log lines so we can use regex to isolate tables
         filecont, error = get_filecont(file, split=False)
 
         if error != "":
             logger.error('Error in _get_polarizability: %s\t%s', file.name, error)
-            row_i = pd.Series({FILE_COLUMN_NAME:file.name, 'polar_iso(au)': None, 'polar_aniso(au)': None})
 
         else:
             matches = re.findall(POLARIZABILITY_TABLE_PATTERN, filecont)
 
             if len(matches) == 0:
-                logger.error('No polarizability information was found using POLARIZABILITY_TABLE_PATTERN')
+                logger.error('No polarizability information was found in %s', file.name)
             else:
                 # Get the last match
                 match = matches[-1].split('\n')
@@ -198,7 +198,6 @@ def _get_polarizability(file: Path) -> pd.DataFrame:
 
     except Exception as e:
         logger.error('Unable to acquire polarizability for: %s because %s', file.name, e)
-        row_i = pd.Series({FILE_COLUMN_NAME:file.name, 'polar_iso(Debye)': None, 'polar_aniso(Debye)': None})
 
     return pd.DataFrame(row_i).transpose()
 
