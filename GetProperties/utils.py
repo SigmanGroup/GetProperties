@@ -58,6 +58,22 @@ def log_to_mol_file(log: Path):
     '''
     subprocess.run(args=['obabel', '-ilog', f'{log.absolute()}', '-omol', '-m'], cwd=log.parent, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
+def orca_to_mol_file(file: Path) -> None:
+    '''
+    Convert an ORCA output file to one or more Mol files using Open Babel.
+    This file should have the same name as the ORCA output file with the
+    `.mol` extension
+
+    Parameters
+    ----------
+    log: Path
+        Path to the Gaussian logfile to convert.
+
+    Returns
+    -------
+    None
+    '''
+    subprocess.run(args=['obabel', '-iorca', f'{file.absolute()}', '-omol', '-m'], cwd=file.parent, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 def _get_atom_map(file: Path,
                   substructure: Chem.Mol) -> list:
