@@ -53,8 +53,11 @@ def _get_goodvibes_freq_scale_factor(file: Path):
     # Search the built-in GoodVibes scale-factor tables.
     for data in (scaling_data_dict, scaling_data_dict_mod):
         if level in data:
-            logger.info('Found %s in GoodVibes scaling data.\tzpe_fac: %f', level, data[level].zpe_fac)
-            return data[level].zpe_fac
+            logger.info('Found %s in GoodVibes scaling data.\tzpe_fac: %f\tType: %s', level, data[level].zpe_fac, type(data[level].zpe_fac))
+
+            # This must be returned as type float because
+            # It was specified as float32 (f4) in goodvibes
+            return float(data[level].zpe_fac)
 
     # Match the GoodVibes fallback when no match is found.
     logger.warning('Defaulting to zpe_fac = 1.0 for %s', level)
