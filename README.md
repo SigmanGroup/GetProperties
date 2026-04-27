@@ -5,13 +5,26 @@ original script, please visit the [original repository](https://github.com/Sigma
 
 ## Installation
 
-1. Create a conda environment using the  gpenv_312.yml file.
+1. Clone the repository.
+
+    `git clone https://github.com/SigmanGroup/GetProperties.git`
+
+2. `cd` into the project directory.
+
+    `cd GetProperties`
+
+3. Create a conda environment using the `gpenv_312.yml` file.
 
     `conda env create -f gpenv_312.yml`
 
-2. Activate the environment and use the notebook.
+4. Activate the environment.
 
     `conda activate gpenv_312`
+
+5. Install the `GetProperties` package. This will allow you to run `get_properties.ipynb` anywhere on your system
+and not just in the cloned repository directory.
+
+    `pip install .`
 
 ## Usage
 
