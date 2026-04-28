@@ -152,19 +152,19 @@ def get_goodvibes_data(dataframe: pd.DataFrame,
     '''
     Extracts the following properties
 
-    E_spc (Hartree)
-    ZPE(Hartree)
-    H_spc(Hartree)
-    T*S
-    T*qh_S
-    G(T)_spc(Hartree)
-    qh_G(T)_spc(Hartree)
-    T
+    - E_spc (Hartree)
+    - ZPE(Hartree)
+    - H_spc(Hartree)
+    - T*S
+    - T*qh_S
+    - G(T)_spc(Hartree)
+    - qh_G(T)_spc(Hartree)
+    - T
 
     Parameters
     ----------
     dataframe: pd.DataFrame
-        DataFrame containing <FILE_COLUMN_NAME> column
+        DataFrame containing `FILE_COLUMN_NAME` column
 
     data_dir: Path
         Directory where the files are located
@@ -178,7 +178,7 @@ def get_goodvibes_data(dataframe: pd.DataFrame,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     files = [Path(data_dir / x) for x in dataframe[FILE_COLUMN_NAME].to_list()]

@@ -70,7 +70,7 @@ def _get_frontier_orbs(file: Path) -> pd.DataFrame:
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     configure_logger(debug=False)
@@ -119,12 +119,12 @@ def get_frontierorbs(dataframe: pd.DataFrame,
                      procs: int = 1):
     '''
     Extracts the homo, lumo energies and derived values of last job in file
-    from files in the <FILE_COLUMN_NAME> column of a DataFrame
+    from files in the `FILE_COLUMN_NAME` column of a DataFrame
 
     Parameters
     ----------
     dataframe: pd.DataFrame
-        DataFrame containing <FILE_COLUMN_NAME> column
+        DataFrame containing `FILE_COLUMN_NAME` column
 
     data_dir: Path
         Directory where the files are located
@@ -135,7 +135,7 @@ def get_frontierorbs(dataframe: pd.DataFrame,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     files = [Path(data_dir / x) for x in dataframe[FILE_COLUMN_NAME].to_list()]
@@ -169,7 +169,7 @@ def _get_polarizability(file: Path) -> pd.DataFrame:
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     configure_logger(debug=False)
@@ -206,13 +206,13 @@ def get_polarizability(dataframe: pd.DataFrame,
                        data_dir: Path,
                        procs: int = 1) -> pd.DataFrame:
     '''
-    Extracts the polarizability from files in the <FILE_COLUMN_NAME> column
+    Extracts the polarizability from files in the `FILE_COLUMN_NAME` column
     of a DataFrame
 
     Parameters
     ----------
     dataframe: pd.DataFrame
-        DataFrame containing <FILE_COLUMN_NAME> column
+        DataFrame containing `FILE_COLUMN_NAME` column
 
     data_dir: Path
         Directory where the files are located
@@ -223,7 +223,7 @@ def get_polarizability(dataframe: pd.DataFrame,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
 
@@ -256,7 +256,7 @@ def _get_dipole(file: Path) -> pd.DataFrame:
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     configure_logger(debug=False)
@@ -283,13 +283,13 @@ def get_dipole(dataframe: pd.DataFrame,
                data_dir: Path,
                procs: int = 1) -> pd.DataFrame:
     '''
-    Extracts the dipole from files in the <FILE_COLUMN_NAME> column
+    Extracts the dipole from files in the `FILE_COLUMN_NAME` column
     of a DataFrame
 
     Parameters
     ----------
     dataframe: pd.DataFrame
-        DataFrame containing <FILE_COLUMN_NAME> column
+        DataFrame containing `FILE_COLUMN_NAME` column
 
     data_dir: Path
         Directory where the files are located
@@ -300,7 +300,7 @@ def get_dipole(dataframe: pd.DataFrame,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
 
@@ -333,7 +333,7 @@ def _get_volume(file: Path) -> pd.DataFrame:
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     configure_logger(debug=False)
@@ -362,13 +362,13 @@ def get_volume(dataframe: pd.DataFrame,
                data_dir: Path,
                procs: int = 1) -> pd.DataFrame:
     '''
-    Extracts the volume from files in the <FILE_COLUMN_NAME> column
+    Extracts the volume from files in the `FILE_COLUMN_NAME` column
     of a DataFrame
 
     Parameters
     ----------
     dataframe: pd.DataFrame
-        DataFrame containing <FILE_COLUMN_NAME> column
+        DataFrame containing `FILE_COLUMN_NAME` column
 
     data_dir: Path
         Directory where the files are located
@@ -379,7 +379,7 @@ def get_volume(dataframe: pd.DataFrame,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     files = [Path(data_dir / x) for x in dataframe[FILE_COLUMN_NAME].to_list()]
@@ -411,7 +411,7 @@ def _get_SASA(file: Path) -> pd.DataFrame:
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     configure_logger(debug=False)
@@ -455,13 +455,13 @@ def get_SASA(dataframe: pd.DataFrame,
              procs: int = 1) -> pd.DataFrame:
     '''
     Uses MORFEUS to calculate solvent accessible surface area (SASA) for files
-    in the <FILE_COLUMN_NAME> column of a DataFrame. If you want to SASA with different
+    in the `FILE_COLUMN_NAME` column of a DataFrame. If you want to SASA with different
     probe radii, MORFEUS has this functionality, but it has not been implemented here.
 
     Parameters
     ----------
     dataframe: pd.DataFrame
-        DataFrame containing <FILE_COLUMN_NAME> column
+        DataFrame containing `FILE_COLUMN_NAME` column
 
     data_dir: Path
         Directory where the files are located
@@ -472,7 +472,7 @@ def get_SASA(dataframe: pd.DataFrame,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     files = [Path(data_dir / x) for x in dataframe[FILE_COLUMN_NAME].to_list()]
@@ -494,7 +494,7 @@ def get_SASA(dataframe: pd.DataFrame,
 
 def _get_nbo(row: pd.Series) -> pd.DataFrame:
     '''
-    The input is a pd.Series (row) that containes a <FILE_COLUMN_NAME>
+    The input is a pd.Series (row) that containes a `FILE_COLUMN_NAME`
     item that is a string representation Path to the .log file.
 
     The remaining items should be atom_label: atom_number (1-indexed)
@@ -509,7 +509,7 @@ def _get_nbo(row: pd.Series) -> pd.DataFrame:
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     configure_logger(debug=False)
@@ -576,13 +576,13 @@ def get_nbo(dataframe: pd.DataFrame,
             data_dir: Path,
             procs: int = 1) -> pd.DataFrame:
     '''
-    Gets the nbo for all atoms (a_list, form ["C1", "C4", "O2"]) in a
+    Gets the NPA charge for all atoms (a_list=["C1", "C4", "O2"]) in a
     dataframe that contains file name and atom number (1-indexed)
 
     Parameters
     ----------
     dataframe: pd.DataFrame
-        DataFrame containing <FILE_COLUMN_NAME> column
+        DataFrame containing `FILE_COLUMN_NAME` column
 
     data_dir: Path
         Directory where the files are located
@@ -593,14 +593,14 @@ def get_nbo(dataframe: pd.DataFrame,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     interesting_columns = [FILE_COLUMN_NAME]
     interesting_columns.extend(atom_list)
     calculation_df = dataframe[interesting_columns].copy(deep=True)
 
-    # Convert the <FILE_COLUMN_NAME> column to path
+    # Convert the `FILE_COLUMN_NAME` column to path
     calculation_df[FILE_COLUMN_NAME] = [str(Path(data_dir / x).absolute()) for x in calculation_df[FILE_COLUMN_NAME].to_list()]
 
     # Get the rows of the dataframe that we will use as input for parallelization
@@ -623,7 +623,7 @@ def get_nbo(dataframe: pd.DataFrame,
 
 def _get_nmr(row: pd.Series) -> pd.DataFrame:
     '''
-    The input is a pd.Series (row) that containes a <FILE_COLUMN_NAME>
+    The input is a pd.Series (row) that containes a `FILE_COLUMN_NAME`
     item that is a string representation Path to the .log file.
 
     Extracts the scalar isotropic shielding for the atoms specified
@@ -638,7 +638,7 @@ def _get_nmr(row: pd.Series) -> pd.DataFrame:
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     configure_logger(debug=False)
@@ -698,7 +698,7 @@ def get_nmr(dataframe: pd.DataFrame,
     Parameters
     ----------
     dataframe: pd.DataFrame
-        DataFrame containing <FILE_COLUMN_NAME> column
+        DataFrame containing `FILE_COLUMN_NAME` column
 
     atom_list: list[str]
         List of atom identifiers for which the property is collected
@@ -712,14 +712,14 @@ def get_nmr(dataframe: pd.DataFrame,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     interesting_columns = [FILE_COLUMN_NAME]
     interesting_columns.extend(atom_list)
     calculation_df = dataframe[interesting_columns].copy(deep=True)
 
-    # Convert the <FILE_COLUMN_NAME> column to path
+    # Convert the `FILE_COLUMN_NAME` column to path
     calculation_df[FILE_COLUMN_NAME] = [str(Path(data_dir / x).absolute()) for x in calculation_df[FILE_COLUMN_NAME].to_list()]
 
     # Get the rows of the dataframe that we will use as input for parallelization
@@ -742,7 +742,7 @@ def get_nmr(dataframe: pd.DataFrame,
 
 def _get_distance(row: pd.Series, dist_list: list[list]) -> pd.Series:
     '''
-    The input is a pd.Series (row) that containes a <FILE_COLUMN_NAME>
+    The input is a pd.Series (row) that containes a `FILE_COLUMN_NAME`
     item that is a string representation Path to the .log file.
 
     Parameters
@@ -756,7 +756,7 @@ def _get_distance(row: pd.Series, dist_list: list[list]) -> pd.Series:
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     configure_logger(debug=False)
@@ -813,12 +813,12 @@ def get_distance(dataframe: pd.DataFrame,
     Gets the distance between atoms defined by a list of list of strings
     where the innermost strings are the atom labels in the dataframe
     (dist_list, form [[C1, O2], [C4, C1]]) in a dataframe that contains
-    <FILE_COLUMN_NAME> and atom number.
+    `FILE_COLUMN_NAME` and atom number.
 
     Parameters
     ----------
     dataframe: pd.DataFrame
-        DataFrame containing <FILE_COLUMN_NAME> column
+        DataFrame containing `FILE_COLUMN_NAME` column
 
     dist_list: list[list[str]]
         List of lists that contain the pairs of atom labels for which
@@ -833,7 +833,7 @@ def get_distance(dataframe: pd.DataFrame,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
 
@@ -847,7 +847,7 @@ def get_distance(dataframe: pd.DataFrame,
     interesting_columns.extend(list(set([x for xs in dist_list for x in xs])))
     calculation_df = dataframe[interesting_columns].copy(deep=True)
 
-    # Convert the <FILE_COLUMN_NAME> column to path
+    # Convert the `FILE_COLUMN_NAME` column to path
     calculation_df[FILE_COLUMN_NAME] = [str(Path(data_dir / x).absolute()) for x in calculation_df[FILE_COLUMN_NAME].to_list()]
 
     # Get the rows of the dataframe that we will use as input for parallelization
@@ -870,7 +870,7 @@ def get_distance(dataframe: pd.DataFrame,
 
 def _get_angles(row: pd.Series, angle_list: list[list]) -> pd.Series:
     '''
-    The input is a pd.Series (row) that containes a <FILE_COLUMN_NAME>
+    The input is a pd.Series (row) that containes a `FILE_COLUMN_NAME`
     item that is a string representation Path to the .log file.
 
     The remaining items should be atom_label: atom_number (1-indexed)
@@ -880,7 +880,7 @@ def _get_angles(row: pd.Series, angle_list: list[list]) -> pd.Series:
     Parameters
     ----------
     row: pd.Series
-        Series that contains <FILE_COLUMN_NAME> which is a path to the
+        Series that contains `FILE_COLUMN_NAME` which is a path to the
         file to be used for angle calculation as well as the
         atom labels
 
@@ -891,7 +891,7 @@ def _get_angles(row: pd.Series, angle_list: list[list]) -> pd.Series:
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     configure_logger(debug=False)
@@ -951,12 +951,12 @@ def get_angles(dataframe: pd.DataFrame,
     Gets the angle between three atoms defined by a list of list of strings
     where the innermost strings are the atom labels in the dataframe
     (angle_list, form [[O3, C1, O2], [C4, C1, O3]]) in a dataframe that contains
-    <FILE_COLUMN_NAME> and atom number.
+    `FILE_COLUMN_NAME` and atom number.
 
     Parameters
     ----------
     dataframe: pd.DataFrame
-        DataFrame containing <FILE_COLUMN_NAME> column
+        DataFrame containing `FILE_COLUMN_NAME` column
 
     angle_list: list[list[str]]
         List of lists that contain the pairs of atom labels for which
@@ -971,14 +971,14 @@ def get_angles(dataframe: pd.DataFrame,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     interesting_columns = [FILE_COLUMN_NAME]
     interesting_columns.extend(list(set([x for xs in angle_list for x in xs])))
     calculation_df = dataframe[interesting_columns].copy(deep=True)
 
-    # Convert the <FILE_COLUMN_NAME> column to path
+    # Convert the `FILE_COLUMN_NAME` column to path
     calculation_df[FILE_COLUMN_NAME] = [str(Path(data_dir / x).absolute()) for x in calculation_df[FILE_COLUMN_NAME].to_list()]
 
     # Get the rows of the dataframe that we will use as input for parallelization
@@ -1001,7 +1001,7 @@ def get_angles(dataframe: pd.DataFrame,
 
 def _get_dihedral(row: pd.Series, dihedral_list: list[list]) -> pd.Series:
     '''
-    The input is a pd.Series (row) that containes a <FILE_COLUMN_NAME>
+    The input is a pd.Series (row) that containes a `FILE_COLUMN_NAME`
     item that is a string representation Path to the .log file.
 
     The remaining items should be atom_label: atom_number (1-indexed)
@@ -1011,7 +1011,7 @@ def _get_dihedral(row: pd.Series, dihedral_list: list[list]) -> pd.Series:
     Parameters
     ----------
     row: pd.Series
-        Series that contains <FILE_COLUMN_NAME> which is a path to the
+        Series that contains `FILE_COLUMN_NAME` which is a path to the
         file to be used for dihedral calculation as well as the
         atom labels
 
@@ -1022,7 +1022,7 @@ def _get_dihedral(row: pd.Series, dihedral_list: list[list]) -> pd.Series:
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     configure_logger(debug=False)
@@ -1085,12 +1085,12 @@ def get_dihedral(dataframe: pd.DataFrame,
     Gets the dihedral angle of four atoms defined by a list of list of strings
     where the innermost strings are the atom labels in the dataframe
     (dihedral_list, form [['O1', 'C1', 'CA', 'C2']]) in a dataframe that contains
-    <FILE_COLUMN_NAME> and atom number.
+    `FILE_COLUMN_NAME` and atom number.
 
     Parameters
     ----------
     dataframe: pd.DataFrame
-        DataFrame containing <FILE_COLUMN_NAME> column
+        DataFrame containing `FILE_COLUMN_NAME` column
 
     dihedral_list: list[list[str]]
         List of list of strings where the strings are the atom labels
@@ -1105,14 +1105,14 @@ def get_dihedral(dataframe: pd.DataFrame,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     interesting_columns = [FILE_COLUMN_NAME]
     interesting_columns.extend(list(set([x for xs in dihedral_list for x in xs])))
     calculation_df = dataframe[interesting_columns].copy(deep=True)
 
-    # Convert the <FILE_COLUMN_NAME> column to path
+    # Convert the `FILE_COLUMN_NAME` column to path
     calculation_df[FILE_COLUMN_NAME] = [str(Path(data_dir / x).absolute()) for x in calculation_df[FILE_COLUMN_NAME].to_list()]
 
     # Get the rows of the dataframe that we will use as input for parallelization
@@ -1143,7 +1143,7 @@ def _get_vbur(row: pd.Series,
     Parameters
     ----------
     row: pd.Series
-        Series that contains <FILE_COLUMN_NAME> which is a path to the
+        Series that contains `FILE_COLUMN_NAME` which is a path to the
         file to be used for vbur calculation as well as the
         atom labels
 
@@ -1157,7 +1157,7 @@ def _get_vbur(row: pd.Series,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     configure_logger(debug=False)
@@ -1222,7 +1222,7 @@ def get_vbur_scan(dataframe: pd.DataFrame,
     Parameters
     ----------
     dataframe: pd.DataFrame
-        DataFrame containing <FILE_COLUMN_NAME> column
+        DataFrame containing `FILE_COLUMN_NAME` column
 
     data_dir: Path
         Directory where the files are located
@@ -1248,7 +1248,7 @@ def get_vbur_scan(dataframe: pd.DataFrame,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     assert FILE_COLUMN_NAME in dataframe.columns
@@ -1262,7 +1262,7 @@ def get_vbur_scan(dataframe: pd.DataFrame,
     if end_r not in radii:
         radii.append(end_r)
 
-    # Convert the <FILE_COLUMN_NAME> column to path
+    # Convert the `FILE_COLUMN_NAME` column to path
     calculation_df[FILE_COLUMN_NAME] = [str(Path(data_dir / x).absolute()) for x in calculation_df[FILE_COLUMN_NAME].to_list()]
 
     # Get the rows of the dataframe that we will use as input for parallelization
@@ -1293,7 +1293,7 @@ def _get_sterimol_morfeus(row: pd.Series,
     Parameters
     ----------
     row: pd.Series
-        Series that contains <FILE_COLUMN_NAME> which is a path to the
+        Series that contains `FILE_COLUMN_NAME` which is a path to the
         file to be used for vbur calculation as well as the
         atom labels
 
@@ -1307,7 +1307,7 @@ def _get_sterimol_morfeus(row: pd.Series,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     configure_logger(debug=False)
@@ -1393,7 +1393,7 @@ def get_sterimol_morfeus(dataframe: pd.DataFrame,
     Parameters
     ----------
     dataframe: pd.DataFrame
-        DataFrame containing <FILE_COLUMN_NAME> column
+        DataFrame containing `FILE_COLUMN_NAME` column
 
     data_dir: Path
         Directory where the files are located
@@ -1411,14 +1411,14 @@ def get_sterimol_morfeus(dataframe: pd.DataFrame,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     interesting_columns = [FILE_COLUMN_NAME]
     interesting_columns.extend(list(set([x for xs in sterimol_list for x in xs])))
     calculation_df = dataframe[interesting_columns].copy(deep=True)
 
-    # Convert the <FILE_COLUMN_NAME> column to path
+    # Convert the `FILE_COLUMN_NAME` column to path
     calculation_df[FILE_COLUMN_NAME] = [str(Path(data_dir / x).absolute()) for x in calculation_df[FILE_COLUMN_NAME].to_list()]
 
     # Flatten the list of inputs to assess the label presence in the dataframe
@@ -1446,7 +1446,7 @@ def get_sterimol_morfeus(dataframe: pd.DataFrame,
 
 def _get_chelpg(row: pd.Series, a_list: list[str]) -> pd.DataFrame:
     '''
-    The input is a pd.Series (row) that containes a <FILE_COLUMN_NAME>
+    The input is a pd.Series (row) that containes a `FILE_COLUMN_NAME`
     item that is a string representation Path to the .log file.
 
     The remaining items should be atom_label: atom_number (1-indexed)
@@ -1464,7 +1464,7 @@ def _get_chelpg(row: pd.Series, a_list: list[str]) -> pd.DataFrame:
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     configure_logger(debug=False)
@@ -1518,7 +1518,7 @@ def get_chelpg(dataframe: pd.DataFrame,
     Parameters
     ----------
     dataframe: pd.DataFrame
-        DataFrame containing <FILE_COLUMN_NAME> column
+        DataFrame containing `FILE_COLUMN_NAME` column
 
     atom_list: list[str]
         List of atom identifiers for which the property is collected
@@ -1532,14 +1532,14 @@ def get_chelpg(dataframe: pd.DataFrame,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     interesting_columns = [FILE_COLUMN_NAME]
     interesting_columns.extend(atom_list)
     calculation_df = dataframe[interesting_columns].copy(deep=True)
 
-    # Convert the <FILE_COLUMN_NAME> column to path
+    # Convert the `FILE_COLUMN_NAME` column to path
     calculation_df[FILE_COLUMN_NAME] = [str(Path(data_dir / x).absolute()) for x in calculation_df[FILE_COLUMN_NAME].to_list()]
 
     # Get the rows of the dataframe that we will use as input for parallelization
@@ -1562,7 +1562,7 @@ def get_chelpg(dataframe: pd.DataFrame,
 
 def _get_hirshfeld(row: pd.Series, a_list: list[str]) -> pd.DataFrame:
     '''
-    The input is a pd.Series (row) that containes a <FILE_COLUMN_NAME>
+    The input is a pd.Series (row) that containes a `FILE_COLUMN_NAME`
     item that is a string representation Path to the .log file.
 
     The remaining items should be atom_label: atom_number (1-indexed)
@@ -1580,7 +1580,7 @@ def _get_hirshfeld(row: pd.Series, a_list: list[str]) -> pd.DataFrame:
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     configure_logger(debug=False)
@@ -1640,7 +1640,7 @@ def get_hirshfeld(dataframe: pd.DataFrame,
     Parameters
     ----------
     dataframe: pd.DataFrame
-        DataFrame containing <FILE_COLUMN_NAME> column
+        DataFrame containing `FILE_COLUMN_NAME` column
 
     atom_list: list[str]
         List of atom identifiers for which the property is collected
@@ -1654,14 +1654,14 @@ def get_hirshfeld(dataframe: pd.DataFrame,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     interesting_columns = [FILE_COLUMN_NAME]
     interesting_columns.extend(atom_list)
     calculation_df = dataframe[interesting_columns].copy(deep=True)
 
-    # Convert the <FILE_COLUMN_NAME> column to path
+    # Convert the `FILE_COLUMN_NAME` column to path
     calculation_df[FILE_COLUMN_NAME] = [str(Path(data_dir / x).absolute()) for x in calculation_df[FILE_COLUMN_NAME].to_list()]
 
     # Get the rows of the dataframe that we will use as input for parallelization
@@ -1685,7 +1685,7 @@ def get_hirshfeld(dataframe: pd.DataFrame,
 def _get_pyramidalization(row: pd.Series,
                           a_list: list[str]) -> pd.DataFrame:
     '''
-    The input is a pd.Series (row) that containes a <FILE_COLUMN_NAME>
+    The input is a pd.Series (row) that containes a `FILE_COLUMN_NAME`
     item that is a string representation Path to the .log file.
 
     The remaining items should be atom_label: atom_number (1-indexed)
@@ -1704,7 +1704,7 @@ def _get_pyramidalization(row: pd.Series,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     configure_logger(debug=False)
@@ -1760,7 +1760,7 @@ def get_pyramidalization(dataframe: pd.DataFrame,
     interesting_columns.extend(atom_list)
     calculation_df = dataframe[interesting_columns].copy(deep=True)
 
-    # Convert the <FILE_COLUMN_NAME> column to path
+    # Convert the `FILE_COLUMN_NAME` column to path
     calculation_df[FILE_COLUMN_NAME] = [str(Path(data_dir / x).absolute()) for x in calculation_df[FILE_COLUMN_NAME].to_list()]
 
     # Get the rows of the dataframe that we will use as input for parallelization
@@ -1845,7 +1845,7 @@ def _get_wall_time(file: Path) -> pd.DataFrame:
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     configure_logger(debug=False)
@@ -1923,7 +1923,7 @@ def _get_plane_angle(row: pd.Series,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors.
     '''
     configure_logger(debug=False)
@@ -2006,12 +2006,12 @@ def get_plane_angle(dataframe: pd.DataFrame,
     Gets the distance between atoms defined by a list of list of strings
     where the innermost strings are the atom labels in the dataframe
     (dist_list, form [[C1, O2], [C4, C1]]) in a dataframe that contains
-    <FILE_COLUMN_NAME> and atom number.
+    `FILE_COLUMN_NAME` and atom number.
 
     Parameters
     ----------
     dataframe: pd.DataFrame
-        DataFrame containing <FILE_COLUMN_NAME> column
+        DataFrame containing `FILE_COLUMN_NAME` column
 
     dist_list: list[list[str]]
         List of lists that contain the pairs of atom labels for which
@@ -2026,7 +2026,7 @@ def get_plane_angle(dataframe: pd.DataFrame,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
 
@@ -2037,7 +2037,7 @@ def get_plane_angle(dataframe: pd.DataFrame,
     Parameters
     ----------
     dataframe: pd.DataFrame
-        DataFrame containing <FILE_COLUMN_NAME> column
+        DataFrame containing `FILE_COLUMN_NAME` column
 
     data_dir: Path
         Directory where the files are located
@@ -2048,7 +2048,7 @@ def get_plane_angle(dataframe: pd.DataFrame,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
 
@@ -2060,7 +2060,7 @@ def get_plane_angle(dataframe: pd.DataFrame,
     interesting_columns.extend(list(set([x for xs in plane_atom_names for x in xs])))
     calculation_df = dataframe[interesting_columns].copy(deep=True)
 
-    # Convert the <FILE_COLUMN_NAME> column to path
+    # Convert the `FILE_COLUMN_NAME` column to path
     calculation_df[FILE_COLUMN_NAME] = [str(Path(data_dir / x).absolute()) for x in calculation_df[FILE_COLUMN_NAME].to_list()]
 
     # Get the rows of the dataframe that we will use as input for parallelization
@@ -2095,7 +2095,7 @@ def _get_sterimol_dbstep(row: pd.Series,
     Parameters
     ----------
     row: pd.Series
-        Series that contains <FILE_COLUMN_NAME> which is a path to the
+        Series that contains `FILE_COLUMN_NAME` which is a path to the
         file to be used for vbur calculation as well as the
         atom labels
 
@@ -2106,7 +2106,7 @@ def _get_sterimol_dbstep(row: pd.Series,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     configure_logger(debug=False)
@@ -2168,7 +2168,7 @@ def get_sterimol_dbstep(dataframe: pd.DataFrame,
     Parameters
     ----------
     dataframe: pd.DataFrame
-        DataFrame containing <FILE_COLUMN_NAME> column
+        DataFrame containing `FILE_COLUMN_NAME` column
 
     data_dir: Path
         Directory where the files are located
@@ -2183,14 +2183,14 @@ def get_sterimol_dbstep(dataframe: pd.DataFrame,
     Returns
     ----------
     pd.DataFrame
-        The DataFrame containing the <FILE_COLUMN_NAME> column and
+        The DataFrame containing the `FILE_COLUMN_NAME` column and
         the resultant descriptors
     '''
     interesting_columns = [FILE_COLUMN_NAME]
     interesting_columns.extend(list(set([x for xs in sterimol_list for x in xs])))
     calculation_df = dataframe[interesting_columns].copy(deep=True)
 
-    # Convert the <FILE_COLUMN_NAME> column to path
+    # Convert the `FILE_COLUMN_NAME` column to path
     calculation_df[FILE_COLUMN_NAME] = [str(Path(data_dir / x).absolute()) for x in calculation_df[FILE_COLUMN_NAME].to_list()]
 
     # Flatten the list of inputs to assess the label presence in the dataframe
