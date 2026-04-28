@@ -23,13 +23,6 @@ from .utils import configure_logger
 
 logger = logging.getLogger(__name__)
 
-# Format the logging (you don't have to edit this)
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='[%(levelname)-5s - %(asctime)s] [%(module)s] %(message)s',
-    datefmt='%m/%d/%Y:%H:%M:%S',  # Correct way to format the date
-    handlers=[logging.StreamHandler(sys.stdout)]
-)
 
 def _get_goodvibes_freq_scale_factor(file: Path):
     '''
@@ -204,9 +197,11 @@ def get_goodvibes_data(dataframe: pd.DataFrame,
 
 if __name__ == "__main__":
 
+    # Format the logging (you don't have to edit this)
     logging.basicConfig(
         level=logging.DEBUG,
         format='[%(levelname)-5s - %(asctime)s] [%(module)s] %(message)s',
         datefmt='%m/%d/%Y:%H:%M:%S',  # Correct way to format the date
         handlers=[logging.StreamHandler(sys.stdout)]
     )
+
