@@ -46,3 +46,5 @@ test_*/
 test_*.ipynb
 *.egg-info
 build/
+data/*/*.mol
+tests/*/data/*.mol
