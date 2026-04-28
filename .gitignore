@@ -44,3 +44,5 @@ orca_energy.py
 property_functions_orca.py
 test_*/
 test_*.ipynb
+*.egg-info
+build/
