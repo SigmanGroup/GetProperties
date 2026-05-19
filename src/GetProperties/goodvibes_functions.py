@@ -2,7 +2,7 @@
 # coding: utf-8
 
 '''
-Functions specifically for the GoodVibes thermochemical extraction
+Functions that depend on GoodVibes
 '''
 
 import sys

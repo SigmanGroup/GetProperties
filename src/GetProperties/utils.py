@@ -106,16 +106,16 @@ def _get_atom_map(file: Path,
     mapping = []
     logfile = file.with_suffix('.log')
 
+    mapping.append(logfile.name)
+
     if not logfile.exists():
         logger.error('Could not locate %s', logfile.absolute())
-        return file, None
-
-    mapping.append(logfile.name)
+        return mapping
 
     # Read in the sdf file
     file, mol = _read_in_mol_sdf_with_xyz_correction(file)
     if mol is None:
-        return file, None
+        return mapping
 
     # Get the substructure match
     matches = mol.GetSubstructMatches(substructure)
@@ -219,8 +219,10 @@ def _read_in_mol_sdf_with_xyz_correction(file: Path) -> tuple[Path | None] | tup
             rdDetermineBonds.DetermineConnectivity(mol)
             rdDetermineBonds.DetermineBondOrders(mol)
         except ValueError as e:
-            logger.warning('Could not determine bod orders for %s', file.name)
+            logger.warning('Could not determine bond orders for %s', file.name)
             return file, None
+
+        logger.info('Successfully read in %s as .xyz', file.name)
 
     return file, mol
 

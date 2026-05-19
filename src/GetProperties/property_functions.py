@@ -2,7 +2,7 @@
 # coding: utf-8
 
 '''
-New parallelized functions for get_properties
+Functions for GetProperties (Gaussian 16)
 '''
 
 import re
