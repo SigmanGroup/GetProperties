@@ -1,6 +1,5 @@
 name: gpenv_312
 channels:
-  - anaconda
   - conda-forge
   - patonlab
 dependencies:
